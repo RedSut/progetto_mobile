@@ -1,16 +1,17 @@
 # progetto_mobile
 
-A new Flutter project.
+Progetto mobile programming
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+per importare librerie: da terminale di android studio "flutter pub get";
 
-A few resources to get you started if this is your first Flutter project:
+Librerie usate:
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+cosa fa per adesso l'app:
+Tocco su “Feed him”:	La fame (non ancora mostrata) si aggiorna internamente
+Apri Drawer (anche con swipe):	Vedi voci Bag, Stats, Settings
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+L'app NON salva ancora niente, nessun dato
