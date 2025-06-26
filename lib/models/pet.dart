@@ -1,22 +1,33 @@
-import 'package:flutter/material.dart';               // Necessario per ChangeNotifier
+import 'package:flutter/material.dart';            // Necessario per ChangeNotifier
 
-class Pet extends ChangeNotifier {                    // Modello che rappresenta il mostro e notifica i listener
-  int level = 0;                                      // Livello di esperienza attuale
-  int hunger = 100;                                   // Stato di fame (0 = affamato, 100 = sazio)
-  int happiness = 100;                                // Stato di felicità (0 = triste, 100 = felice)
+class Pet extends ChangeNotifier {
+  int level      = 0;
+  int hunger     = 100;
+  int happiness  = 100;
 
-  /// Aggiorna l'esperienza tramite i passi
-  void updateExp(int amount) {                        // Metodo pubblico per incrementare l'esperienza
-    _gainExperience(amount);                          // Converte i passi in esperienza/level-up
-    notifyListeners();                                // Avvisa i widget che devono ridisegnarsi
+  int _xp = 0;                     // esperienza accumulata
+
+  /// Aggiunge [amount] passi/XP e gestisce il livello (max 100)
+  void updateExp(int amount) {
+    if (level >= 100) return;      // già al massimo → esci
+
+    _xp += amount;
+
+    // Converte 1000 XP = +1 livello finché resta XP e level < 100
+    while (_xp >= 1000 && level < 100) {
+      _xp -= 1000;
+      level++;
+    }
+
+    // Se si è appena raggiunto il livello 100, azzera l’XP residuo
+    if (level >= 100) _xp = 0;
+
+    notifyListeners();
   }
 
-  void feed(int foodValue) {                          // Nutre il mostro con un valore di cibo
-    hunger = (hunger + foodValue).clamp(0, 100);      // Aumenta hunger e ne limita il range 0-100
-    notifyListeners();                                // Notifica eventuali listener del cambiamento
-  }
-
-  void _gainExperience(int xp) {                      // Logica interna di aumento livello
-    level += (xp ~/ 1000);                            // Converte 1000 passi in 1 livello (es. 2500 passi → +2)
+  void feed(int foodValue) {
+    hunger     = (hunger    + foodValue      ).clamp(0, 100);
+    happiness  = (happiness + foodValue ~/ 2 ).clamp(0, 100);
+    notifyListeners();
   }
 }

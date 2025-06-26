@@ -1,87 +1,266 @@
-import 'package:flutter/material.dart';                                   // Widget Material di base
-import 'package:progetto_mobile/models/steps.dart';
-import 'package:provider/provider.dart';                                  // Per consumare il modello Pet
-import '../../models/pet.dart';// Importa la logica del pet
+import 'dart:async';
+import 'package:flutter/foundation.dart';            // kDebugMode
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../models/pet.dart';
+import '../../models/steps.dart';
 import 'claim_rewards.dart';
 
-class HomePage extends StatelessWidget {                                  // Home screen senza stato dedicato
-  const HomePage({super.key});                                            // Costruttore const
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
   @override
-  Widget build(BuildContext context) {                                    // Descrive la UI
-    final pet = context.watch<Pet>();                                     // Ascolta i cambiamenti del modello Pet
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  bool _showStats = false;
+  Timer? _mockStepTimer;
+  int _previousLevel = 0;                           // ← nuovo
+
+  @override
+  void initState() {
+    super.initState();
+    // simulazione passi (rimuovere quando integrate il pedometro)
+    _mockStepTimer = Timer.periodic(const Duration(seconds: 10), (_) {
+      context.read<StepsManager>().addSteps(100);
+      context.read<Pet>().updateExp(100);
+    });
+  }
+
+  @override
+  void dispose() {
+    _mockStepTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pet          = context.watch<Pet>();
     final stepsManager = context.watch<StepsManager>();
 
-    return Scaffold(                                                      // Layout base con AppBar e Drawer
-      appBar: AppBar(title: const Text('Pet Steps')),                     // Barra superiore con titolo fisso
-      drawer: const _AppDrawer(),                                         // Menu laterale con voci Bag/Stats/Settings
-      body: Center(                                                       // Centra il contenuto
-        child: Column(                                                    // Dispone i widget in verticale
-          mainAxisSize: MainAxisSize.min,                                 // Occupa solo lo spazio necessario
+    // ─── Messaggio quando il pet passa da livello 0 a 1 ───
+    if (_previousLevel == 0 && pet.level == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            contentPadding: const EdgeInsets.all(24),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text('🎉 Evoluzione!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                SizedBox(height: 16),
+                Text('Il tuo pet si è schiuso!', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                SizedBox(height: 12),
+                Text('Prenditene cura e fallo crescere! 🐣', textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        );
+      });
+    }
+
+    _previousLevel = pet.level;
+
+    return Scaffold(
+      appBar: AppBar(title: const Text('Pet Steps')),
+      drawer: const _AppDrawer(),
+
+      // ─────────────── Corpo ───────────────
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            const CircleAvatar(                                           // Avatar circolare (placeholder creature)
-              radius: 80,                                                 // Raggio di 80 px
-              child: Text('🥚', style: TextStyle(fontSize: 64)),           // Emoji uovo come asset temporaneo
+            // avatar + overlay
+            Stack(
+              alignment: Alignment.center,
+              clipBehavior: Clip.none,
+              children: [
+                GestureDetector(
+                  onLongPressStart: (_) => setState(() => _showStats = true),
+                  onLongPressEnd:   (_) => setState(() => _showStats = false),
+                  child: CircleAvatar(
+                    radius: 80,
+                    backgroundColor: Colors.indigo.shade100,
+                    child: Text(
+                      pet.level == 0 ? '🥚' : '😺',
+                      style: const TextStyle(fontSize: 64),
+                    ),
+                  ),
+                ),
+                if (_showStats)
+                  Positioned(
+                    top: -110,
+                    child: Material(
+                      color: Colors.black.withOpacity(0.75),
+                      borderRadius: BorderRadius.circular(12),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 12),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _StatBar(
+                              label: 'Fame',
+                              value: pet.hunger,
+                              icon: Icons.restaurant,
+                            ),
+                            const SizedBox(height: 8),
+                            _StatBar(
+                              label: 'Felicità',
+                              value: pet.happiness,
+                              icon: Icons.emoji_emotions,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
-            const SizedBox(height: 16),                                   // Spazio verticale
-            Text(                                                         // Mostra il livello corrente
-              'Livello ${pet.level}',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 8),                                    // Altro spacing
-            Text('Passi oggi: ${stepsManager.dailySteps}'),                        // Conta passi giornalieri
-            const SizedBox(height: 24),                                   // Spazio prima dei pulsanti
-            FilledButton(                                                 // Pulsante “Feed him”
-              onPressed: () => pet.feed(20),                              // Nutre il pet con valore 20
+            const SizedBox(height: 24),
+
+            // livello & passi
+            Text('Livello ${pet.level}',
+                style: Theme.of(context).textTheme.titleLarge),
+            const SizedBox(height: 4),
+            Text('Passi oggi: ${stepsManager.dailySteps}'),
+            const SizedBox(height: 24),
+
+            // pulsanti feed / rewards
+            FilledButton(
+              onPressed: () => pet.feed(20),
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(150, 44),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22),
+                ),
+              ),
               child: const Text('Feed him'),
             ),
-            const SizedBox(height: 8),                                    // Spazio
-            OutlinedButton(                                               // Pulsante “Claim rewards”
-              onPressed: () {                                             // Handler ancora da implementare
-                // Apri schermata ricompense
+            const SizedBox(height: 12),
+            OutlinedButton(
+              onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const RewardsPage()),
+                  MaterialPageRoute(builder: (_) => const RewardsPage()),
                 );
               },
+              style: OutlinedButton.styleFrom(
+                minimumSize: const Size(150, 44),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(22),
+                ),
+              ),
               child: const Text('Claim rewards'),
             ),
           ],
         ),
       ),
+
+      // ───────────── Pulsante debug +500 passi ─────────────
+      floatingActionButton: kDebugMode
+          ? FloatingActionButton.small(
+        heroTag: 'debugWalk',
+        tooltip: '+500 passi',
+        child: const Icon(Icons.directions_walk),
+        onPressed: () {
+          final stepsMgr = context.read<StepsManager>();
+          final petRef   = context.read<Pet>();
+
+          stepsMgr.addSteps(500);         // passi ↑
+          petRef.updateExp(500);          // XP / livello
+
+          // fame ↓ 5, felicità ↑ 5
+          petRef
+            ..hunger     = (petRef.hunger - 5).clamp(0, 100)
+            ..happiness  = (petRef.happiness + 5).clamp(0, 100)
+            ..notifyListeners();
+        },
+      )
+          : null,
     );
   }
 }
 
-class _AppDrawer extends StatelessWidget {                                // Drawer personalizzato
+/// Barra di progresso fame / felicità
+class _StatBar extends StatelessWidget {
+  final String label;
+  final int value;
+  final IconData icon;
+
+  const _StatBar({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, color: Colors.white, size: 20),
+        const SizedBox(width: 6),
+        Text(label, style: const TextStyle(color: Colors.white, fontSize: 14)),
+        const SizedBox(width: 8),
+        Container(
+          width: 120,
+          height: 10,
+          decoration: BoxDecoration(
+            color: Colors.white24,
+            borderRadius: BorderRadius.circular(4),
+          ),
+          child: FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: value / 100,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.greenAccent,
+                borderRadius: BorderRadius.circular(4),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Drawer invariato
+class _AppDrawer extends StatelessWidget {
   const _AppDrawer();
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(                                                        // Drawer laterale
-      child: ListView(                                                    // Lista scrollabile di opzioni
+    return Drawer(
+      child: ListView(
         children: [
-          DrawerHeader(                                                   // Testata del menu
-            child: Column(                                                // Contenuto in colonna
+          const DrawerHeader(
+            child: Column(
               children: [
-                const Text('Pet Steps', style: TextStyle(fontSize: 24)),  // Titolo dell’app
-                const SizedBox(height: 8),                                // Spazio
-                Text('Ciao, allenati!'),                                  // Messaggio di benvenuto
+                Text('Pet Steps', style: TextStyle(fontSize: 24)),
+                SizedBox(height: 8),
+                Text('Ciao, allenati!'),
               ],
             ),
           ),
-          ListTile(                                                       // Opzione “Bag”
-            leading: const Icon(Icons.backpack),                          // Icona zaino
-            title: const Text('Bag'),                                     // Testo voce
-            onTap: () {/* TODO */},                                       // Callback da implementare
+          ListTile(
+            leading: const Icon(Icons.backpack),
+            title: const Text('Bag'),
+            onTap: () {/* TODO */},
           ),
-          ListTile(                                                       // Opzione “Stats”
-            leading: const Icon(Icons.bar_chart),                         // Icona grafico
+          ListTile(
+            leading: const Icon(Icons.bar_chart),
             title: const Text('Stats'),
             onTap: () {/* TODO */},
           ),
-          ListTile(                                                       // Opzione “Settings”
-            leading: const Icon(Icons.settings),                          // Icona ingranaggio
+          ListTile(
+            leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: () {/* TODO */},
           ),
