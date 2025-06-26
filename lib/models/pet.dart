@@ -2,13 +2,11 @@ import 'package:flutter/material.dart';               // Necessario per ChangeNo
 
 class Pet extends ChangeNotifier {                    // Modello che rappresenta il mostro e notifica i listener
   int level = 0;                                      // Livello di esperienza attuale
-  int stepsToday = 0;                                 // Passi accumulati nell’arco della giornata
   int hunger = 100;                                   // Stato di fame (0 = affamato, 100 = sazio)
   int happiness = 100;                                // Stato di felicità (0 = triste, 100 = felice)
 
-  /// Aggiorna i passi ricevuti dal pedometro
-  void addSteps(int amount) {                         // Metodo pubblico per incrementare i passi
-    stepsToday += amount;                             // Somma i nuovi passi al contatore giornaliero
+  /// Aggiorna l'esperienza tramite i passi
+  void updateExp(int amount) {                        // Metodo pubblico per incrementare l'esperienza
     _gainExperience(amount);                          // Converte i passi in esperienza/level-up
     notifyListeners();                                // Avvisa i widget che devono ridisegnarsi
   }

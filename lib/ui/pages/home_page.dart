@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';                                   // Widget Material di base
+import 'package:progetto_mobile/models/steps.dart';
 import 'package:provider/provider.dart';                                  // Per consumare il modello Pet
-import '../../models/pet.dart';                                           // Importa la logica del pet
+import '../../models/pet.dart';// Importa la logica del pet
+import 'claim_rewards.dart';
 
 class HomePage extends StatelessWidget {                                  // Home screen senza stato dedicato
   const HomePage({super.key});                                            // Costruttore const
@@ -8,6 +10,7 @@ class HomePage extends StatelessWidget {                                  // Hom
   @override
   Widget build(BuildContext context) {                                    // Descrive la UI
     final pet = context.watch<Pet>();                                     // Ascolta i cambiamenti del modello Pet
+    final stepsManager = context.watch<StepsManager>();
 
     return Scaffold(                                                      // Layout base con AppBar e Drawer
       appBar: AppBar(title: const Text('Pet Steps')),                     // Barra superiore con titolo fisso
@@ -26,7 +29,7 @@ class HomePage extends StatelessWidget {                                  // Hom
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),                                    // Altro spacing
-            Text('Passi oggi: ${pet.stepsToday}'),                        // Conta passi giornalieri
+            Text('Passi oggi: ${stepsManager.dailySteps}'),                        // Conta passi giornalieri
             const SizedBox(height: 24),                                   // Spazio prima dei pulsanti
             FilledButton(                                                 // Pulsante “Feed him”
               onPressed: () => pet.feed(20),                              // Nutre il pet con valore 20
@@ -35,7 +38,11 @@ class HomePage extends StatelessWidget {                                  // Hom
             const SizedBox(height: 8),                                    // Spazio
             OutlinedButton(                                               // Pulsante “Claim rewards”
               onPressed: () {                                             // Handler ancora da implementare
-                // TODO: apri schermata ricompense
+                // Apri schermata ricompense
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const RewardsPage()),
+                );
               },
               child: const Text('Claim rewards'),
             ),
