@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';                               // Widget e tema Material
+import 'package:progetto_mobile/models/challenge.dart';
 import 'package:provider/provider.dart';                              // Provider per dependency injection e stato
 
 import 'models/pet.dart';                                             // Modello Pet (logica di gioco)
 import 'models/steps.dart';                                           // Modello StepsManager (logica per i passi)
+import 'models/bag.dart';
+import 'models/challenge.dart';
 import 'ui/pages/home_page.dart';                                     // Pagina Home dell’app
 
 void main() {                                                         // Entry point dell’app
@@ -18,6 +21,8 @@ class PetStepsApp extends StatelessWidget {                           // Widget 
       providers: [                                                    // Elenco dei provider disponibili
         ChangeNotifierProvider(create: (_) => Pet()),                 // Istanza di Pet, osservabile dai widget
         ChangeNotifierProvider(create: (_) => StepsManager()),        // Istanza di StepsManager, osservabile dai widget
+        ChangeNotifierProvider(create: (_) => Bag()),
+        ChangeNotifierProvider(create: (_) => ChallengeManager()),
       ],
       child: MaterialApp(                                             // App Material (gestisce routing, tema, ecc.)
         title: 'Pet Steps',                                           // Titolo mostrato su Android task-switcher

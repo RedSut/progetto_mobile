@@ -1,11 +1,15 @@
 // Importa i pacchetti necessari
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'dart:async'; // Per gestire Timer e DateTime
+import '../../models/bag.dart';
+import '../../models/challenge.dart';
+import '../../models/reward.dart';
 import '../../models/steps.dart';
 
 // Definisce la schermata Rewards come Stateful perché deve aggiornare i timer nel tempo
 class RewardsPage extends StatefulWidget {
-  const RewardsPage({Key? key}) : super(key: key);
+  const RewardsPage({super.key});
 
   @override
   State<RewardsPage> createState() => _RewardsPageState();
@@ -118,6 +122,18 @@ class _RewardsPageState extends State<RewardsPage> {
             ),
             onPressed: progress >= 1.0 ? () {
               // TODO: Azione quando viene premuto (da implementare)
+                if (progress >= 1.0) {
+                  final bag = Provider.of<Bag>(context, listen: false);
+                  //bag.addReward();
+                  // Magari mostra un dialog di conferma
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Ricompensa riscattata!'),
+                      content: Text('Hai ricevuto una Pozione!'),
+                    ),
+                  );
+                }
             } : null,  // Se progress < 1.0, il bottone è disabilitato
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center, // Centra il contenuto
@@ -157,6 +173,8 @@ class _RewardsPageState extends State<RewardsPage> {
   // Metodo che costruisce la schermata grafica
   @override
   Widget build(BuildContext context) {
+    final stepsManager = Provider.of<StepsManager>(context);
+    final challengeManager = Provider.of<ChallengeManager>(context);
     return Scaffold(
       backgroundColor: Colors.green.shade900, // Colore sfondo schermata
       appBar: AppBar(
@@ -186,46 +204,31 @@ class _RewardsPageState extends State<RewardsPage> {
           // Permette di scorrere verticalmente se i contenuti superano lo schermo
           child: Column(
             children: [
-              // Daily Challenge
-              _buildChallenge(
-                title: 'Daily Challenge - ${_formatDuration(dailyRemaining)} left',
-                description: 'Walk for a total of 2000 steps',
-                progress: StepsManager().dailyProgress.clamp(0.0, 1.0),
-                rewardText: '5x',
-                rewardImage: 'assets/peach.png',
-              ),
-              // Weekly Challenge
-              _buildChallenge(
-                title: 'Weekly Challenge - ${_formatDuration(weeklyRemaining)} left',
-                description: 'Walk for a total of 10000 steps',
-                progress: StepsManager().weeklyProgress.clamp(0.0, 1.0),
-                rewardText: '20x',
-                rewardImage: 'assets/carrot.png',
-              ),
-              // Prima challenge "First steps!"
-              _buildChallenge(
-                title: 'First steps!',
-                description: 'Walk for a total of 1000 steps',
-                progress: StepsManager().steps / 1000,
-                rewardText: '10x',
-                rewardImage: 'assets/strawberry.png',
-              ),
-              // Seconda challenge "Runner"
-              _buildChallenge(
-                title: 'Runner',
-                description: 'Walk for a total of 10000 steps',
-                progress: StepsManager().steps / 10000,
-                rewardText: '20x',
-                rewardImage: 'assets/peach.png',
-              ),
-              // Terza challenge "workaholic"
-              _buildChallenge(
-                title: 'Workaholic',
-                description: 'Walk for a total of 100000 steps',
-                progress: StepsManager().steps / 100000,
-                rewardText: '30x',
-                rewardImage: 'assets/carrot.png',
-              ),
+              // TODO: valutare una gestione più elegante delle durate rimanenti
+              if (challengeManager.challenges.isNotEmpty)
+                _buildChallenge(
+                  title: "${challengeManager.challenges[0].title} + ${_formatDuration(dailyRemaining)} left",
+                  description: challengeManager.challenges[0].description,
+                  progress: stepsManager.dailyProgress.clamp(0.0, 1.0),
+                  rewardText: "${challengeManager.challenges[0].reward.quantity}x",
+                  rewardImage: challengeManager.challenges[0].reward.item.imagePath,
+                ),
+              if (challengeManager.challenges.length > 1)
+                _buildChallenge(
+                  title: "${challengeManager.challenges[1].title} + ${_formatDuration(weeklyRemaining)} left",
+                  description: challengeManager.challenges[1].description,
+                  progress: stepsManager.weeklyProgress.clamp(0.0, 1.0),
+                  rewardText: "${challengeManager.challenges[1].reward.quantity}x",
+                  rewardImage: challengeManager.challenges[1].reward.item.imagePath,
+                ),
+              for (int i = 2; i < challengeManager.challenges.length; i++)
+                _buildChallenge(
+                  title: challengeManager.challenges[i].title,
+                  description: challengeManager.challenges[i].description,
+                  progress: (stepsManager.steps / challengeManager.challenges[i].steps).clamp(0.0, 1.0),
+                  rewardText: "${challengeManager.challenges[i].reward.quantity}x",
+                  rewardImage: challengeManager.challenges[i].reward.item.imagePath,
+                ),
             ],
           ),
         ),
