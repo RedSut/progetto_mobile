@@ -7,7 +7,7 @@ class Pet extends ChangeNotifier {
 
   int _xp = 0;                     // esperienza accumulata
 
-  String imagePath = ''; //TODO: da mettere l'immagine del pet ed aggiornarla alla schiusura
+  String imagePath = 'assets/mostro.png'; //TODO: da mettere l'immagine del pet ed aggiornarla alla schiusura
 
   /// Aggiunge [amount] passi/XP e gestisce il livello (max 100)
   void updateExp(int amount) {

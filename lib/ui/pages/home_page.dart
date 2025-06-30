@@ -7,6 +7,7 @@ import '../../models/pet.dart';
 import '../../models/steps.dart';
 import 'bag_page.dart';
 import 'claim_rewards.dart';
+import 'stats_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -256,13 +257,17 @@ class _AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const BagPage()),
+              MaterialPageRoute(builder: (context) => BagPage()),
             );},
           ),
           ListTile(
             leading: const Icon(Icons.bar_chart),
             title: const Text('Stats'),
-            onTap: () {/* TODO */},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => StatsPage()),
+              );},
           ),
           ListTile(
             leading: const Icon(Icons.settings),

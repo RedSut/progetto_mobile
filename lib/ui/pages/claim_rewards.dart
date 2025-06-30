@@ -101,7 +101,7 @@ class _RewardsPageState extends State<RewardsPage> {
         children: [
           // Titolo
           Text(
-            "${challenge.title} - $duration",
+            "${challenge.title} $duration",
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -211,10 +211,10 @@ class _RewardsPageState extends State<RewardsPage> {
                   String duration = "";
                   if (i == 0) {
                     progress = stepsManager.dailyProgress.clamp(0.0, 1.0);
-                    duration = _formatDuration(dailyRemaining);
+                    duration = '- ${_formatDuration(dailyRemaining)}';
                   } else if (i == 1) {
                     progress = stepsManager.weeklyProgress.clamp(0.0, 1.0);
-                    duration = _formatDuration(weeklyRemaining);
+                    duration = '- ${_formatDuration(weeklyRemaining)}';
                   } else {
                     progress = (stepsManager.steps / challenge.steps).clamp(0.0, 1.0);
                   }
