@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/pet.dart';
 import '../../models/steps.dart';
+import 'bag_page.dart';
 import 'claim_rewards.dart';
 
 class HomePage extends StatefulWidget {
@@ -252,7 +253,11 @@ class _AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.backpack),
             title: const Text('Bag'),
-            onTap: () {/* TODO */},
+            onTap: () {
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const BagPage()),
+            );},
           ),
           ListTile(
             leading: const Icon(Icons.bar_chart),

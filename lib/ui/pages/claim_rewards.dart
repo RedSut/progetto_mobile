@@ -17,6 +17,8 @@ class RewardsPage extends StatefulWidget {
 
 // Stato della schermata Rewards
 class _RewardsPageState extends State<RewardsPage> {
+  Set<int> _claimedChallenges = {};
+  Set<int> _claimingChallenges = {};
   // Durate per il tempo rimanente di daily e weekly challenge
   Duration dailyRemaining = const Duration();
   Duration weeklyRemaining = const Duration();
@@ -35,7 +37,7 @@ class _RewardsPageState extends State<RewardsPage> {
   }
 
   // Calcola i tempi rimanenti per le challenge
-  void _updateTimes() {
+    void _updateTimes() {
     final now = DateTime.now(); // Data e ora attuali
 
     // Prossima mezzanotte per la daily challenge
@@ -51,6 +53,16 @@ class _RewardsPageState extends State<RewardsPage> {
       weeklyRemaining = DateTime(nextMonday.year, nextMonday.month, nextMonday.day)
           .difference(now);
     });
+    // Ottieni challengeManager dal context
+    final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
+
+    // Se siamo entro 1 minuto dalla mezzanotte, resetta i claim delle daily e delle weekly
+    if (dailyRemaining.inSeconds <= 60) {
+      challengeManager.challenges[0].isClaimed = false;
+    }
+    if (weeklyRemaining.inSeconds <= 60) {
+      challengeManager.challenges[1].isClaimed = false;
+    }
   }
 
   // Converte una Duration in stringa tipo "1d23h59m"
@@ -71,11 +83,11 @@ class _RewardsPageState extends State<RewardsPage> {
 
   // Crea il widget grafico per una challenge
   Widget _buildChallenge({
-    required String title, // Titolo della challenge
-    required String description, // Descrizione obiettivo
-    required double progress, // Avanzamento (0.0 - 1.0)
-    required String rewardText, // Quantità della ricompensa
-    required String rewardImage, // Percorso immagine della ricompensa
+    required Challenge challenge,
+    required double progress,
+    required VoidCallback onClaimPressed, // Funzione per aggiornare challenge.claimed
+    required bool isClaiming,
+    required bool isClaimed,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12), // Spaziatura verticale
@@ -89,7 +101,7 @@ class _RewardsPageState extends State<RewardsPage> {
         children: [
           // Titolo
           Text(
-            title,
+            challenge.title,
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -98,7 +110,7 @@ class _RewardsPageState extends State<RewardsPage> {
           const SizedBox(height: 8), // Spaziatura
           // Descrizione obiettivo
           Text(
-            description,
+            challenge.description,
             style: const TextStyle(color: Colors.white70),
           ),
           const SizedBox(height: 12),
@@ -120,38 +132,26 @@ class _RewardsPageState extends State<RewardsPage> {
                 borderRadius: BorderRadius.circular(30), // Angoli arrotondati
               ),
             ),
-            onPressed: progress >= 1.0 ? () {
-              // TODO: Azione quando viene premuto (da implementare)
-                if (progress >= 1.0) {
-                  final bag = Provider.of<Bag>(context, listen: false);
-                  //bag.addReward();
-                  // Magari mostra un dialog di conferma
-                  showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Text('Ricompensa riscattata!'),
-                      content: Text('Hai ricevuto una Pozione!'),
-                    ),
-                  );
-                }
-            } : null,  // Se progress < 1.0, il bottone è disabilitato
+            onPressed: (progress >= 1.0 && !isClaimed && !isClaiming)
+                ? onClaimPressed
+                : null,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center, // Centra il contenuto
               children: [
-                const Text(
-                  'CLAIM REWARD',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                Text(
+                  challenge.isClaimed ? 'CLAIMED' : 'CLAIM REWARD',
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 10),
                 // Quantità della ricompensa (es: "5x")
                 Text(
-                  rewardText,
+                  '${challenge.reward.quantity}x',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(width: 5),
                 // Icona della ricompensa
                 Image.asset(
-                  rewardImage,
+                  challenge.reward.item.imagePath,
                   width: 24,
                   height: 24,
                 ),
@@ -204,31 +204,55 @@ class _RewardsPageState extends State<RewardsPage> {
           // Permette di scorrere verticalmente se i contenuti superano lo schermo
           child: Column(
             children: [
-              // TODO: valutare una gestione più elegante delle durate rimanenti
-              if (challengeManager.challenges.isNotEmpty)
-                _buildChallenge(
-                  title: "${challengeManager.challenges[0].title} + ${_formatDuration(dailyRemaining)} left",
-                  description: challengeManager.challenges[0].description,
-                  progress: stepsManager.dailyProgress.clamp(0.0, 1.0),
-                  rewardText: "${challengeManager.challenges[0].reward.quantity}x",
-                  rewardImage: challengeManager.challenges[0].reward.item.imagePath,
-                ),
-              if (challengeManager.challenges.length > 1)
-                _buildChallenge(
-                  title: "${challengeManager.challenges[1].title} + ${_formatDuration(weeklyRemaining)} left",
-                  description: challengeManager.challenges[1].description,
-                  progress: stepsManager.weeklyProgress.clamp(0.0, 1.0),
-                  rewardText: "${challengeManager.challenges[1].reward.quantity}x",
-                  rewardImage: challengeManager.challenges[1].reward.item.imagePath,
-                ),
-              for (int i = 2; i < challengeManager.challenges.length; i++)
-                _buildChallenge(
-                  title: challengeManager.challenges[i].title,
-                  description: challengeManager.challenges[i].description,
-                  progress: (stepsManager.steps / challengeManager.challenges[i].steps).clamp(0.0, 1.0),
-                  rewardText: "${challengeManager.challenges[i].reward.quantity}x",
-                  rewardImage: challengeManager.challenges[i].reward.item.imagePath,
-                ),
+              for (int i = 0; i < challengeManager.challenges.length; i++)
+                (() {
+                  final challenge = challengeManager.challenges[i];
+                  double progress;
+                  if (i == 0) {
+                    progress = stepsManager.dailyProgress.clamp(0.0, 1.0);
+                  } else if (i == 1) {
+                    progress = stepsManager.weeklyProgress.clamp(0.0, 1.0);
+                  } else {
+                    progress = (stepsManager.steps / challenge.steps).clamp(0.0, 1.0);
+                  }
+
+                  return _buildChallenge(
+                    challenge: challenge,
+                    progress: progress,
+                    isClaimed: challenge.isClaimed || _claimedChallenges.contains(i),
+                    isClaiming: _claimingChallenges.contains(i),
+                    onClaimPressed: () {
+                      if (_claimedChallenges.contains(i) || _claimingChallenges.contains(i)) return;
+
+                      setState(() {
+                        _claimingChallenges.add(i);
+                      });
+
+                      final bag = Provider.of<Bag>(context, listen: false);
+                      bag.addItem(challenge.reward.item, challenge.reward.quantity);
+
+                      setState(() {
+                        challenge.isClaimed = true;
+                        _claimedChallenges.add(i);
+                        _claimingChallenges.remove(i);
+                      });
+
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Ricompensa riscattata!'),
+                          content: Text('Hai ricevuto ${challenge.reward.quantity}x ${challenge.reward.item.name}!'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                })(),
             ],
           ),
         ),

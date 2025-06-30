@@ -10,6 +10,7 @@ class Challenge {
   final Reward reward;
   final String duration;
   final int steps;
+  bool isClaimed;
 
   Challenge({
     required this.id,
@@ -18,6 +19,7 @@ class Challenge {
     required this.reward,
     required this.duration,
     required this.steps,
+    this.isClaimed = false,
   });
 }
 
