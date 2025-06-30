@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'dart:async'; // Per gestire Timer e DateTime
 import '../../models/bag.dart';
 import '../../models/challenge.dart';
-import '../../models/reward.dart';
 import '../../models/steps.dart';
 
 // Definisce la schermata Rewards come Stateful perché deve aggiornare i timer nel tempo
@@ -17,8 +16,8 @@ class RewardsPage extends StatefulWidget {
 
 // Stato della schermata Rewards
 class _RewardsPageState extends State<RewardsPage> {
-  Set<int> _claimedChallenges = {};
-  Set<int> _claimingChallenges = {};
+  final Set<int> _claimedChallenges = {};
+  final Set<int> _claimingChallenges = {};
   // Durate per il tempo rimanente di daily e weekly challenge
   Duration dailyRemaining = const Duration();
   Duration weeklyRemaining = const Duration();
@@ -45,7 +44,7 @@ class _RewardsPageState extends State<RewardsPage> {
 
     // Prossimo lunedì a mezzanotte per la weekly challenge
     final nextMonday = DateTime(now.year, now.month, now.day)
-        .add(Duration(days: (8 - now.weekday) % 7));
+        .add(Duration(days: (8 - now.weekday) % 7 == 0 ? 7 : (8 - now.weekday) % 7));
 
     // Aggiorna lo stato della schermata con i nuovi tempi rimanenti
     setState(() {
@@ -88,6 +87,7 @@ class _RewardsPageState extends State<RewardsPage> {
     required VoidCallback onClaimPressed, // Funzione per aggiornare challenge.claimed
     required bool isClaiming,
     required bool isClaimed,
+    required String duration,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12), // Spaziatura verticale
@@ -101,7 +101,7 @@ class _RewardsPageState extends State<RewardsPage> {
         children: [
           // Titolo
           Text(
-            challenge.title,
+            "${challenge.title} - $duration",
             style: const TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -208,15 +208,19 @@ class _RewardsPageState extends State<RewardsPage> {
                 (() {
                   final challenge = challengeManager.challenges[i];
                   double progress;
+                  String duration = "";
                   if (i == 0) {
                     progress = stepsManager.dailyProgress.clamp(0.0, 1.0);
+                    duration = _formatDuration(dailyRemaining);
                   } else if (i == 1) {
                     progress = stepsManager.weeklyProgress.clamp(0.0, 1.0);
+                    duration = _formatDuration(weeklyRemaining);
                   } else {
                     progress = (stepsManager.steps / challenge.steps).clamp(0.0, 1.0);
                   }
 
                   return _buildChallenge(
+                    duration: duration,
                     challenge: challenge,
                     progress: progress,
                     isClaimed: challenge.isClaimed || _claimedChallenges.contains(i),

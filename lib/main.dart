@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';                              // Provide
 import 'models/pet.dart';                                             // Modello Pet (logica di gioco)
 import 'models/steps.dart';                                           // Modello StepsManager (logica per i passi)
 import 'models/bag.dart';
-import 'models/challenge.dart';
 import 'ui/pages/home_page.dart';                                     // Pagina Home dell’app
 
 void main() {                                                         // Entry point dell’app
