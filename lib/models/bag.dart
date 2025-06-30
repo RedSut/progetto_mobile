@@ -13,18 +13,20 @@ class Bag extends ChangeNotifier {
     }
     notifyListeners();
   }
-
   // Rimuove un item dalla borsa, decrementando la quantità o eliminandolo se arriva a 0
-  void removeItem(Item item, int quantity) {
-    if (items.containsKey(item)) {
-      final currentQuantity = items[item]!;
-      if (currentQuantity > quantity) {
-        items[item] = currentQuantity - quantity;
-      } else {
-        items.remove(item);
-      }
-      notifyListeners();
+  // Rimuove [quantity] unità di [item] se presenti.
+  // Restituisce `true` se la rimozione ha avuto successo.
+  bool removeItem(Item item, int quantity) {
+    final currentQuantity = items[item];
+    if (currentQuantity == null) return false;
+
+    if (currentQuantity > quantity) {
+      items[item] = currentQuantity - quantity;
+    } else {
+      items.remove(item);
     }
+    notifyListeners();
+    return true;
   }
 
   // Metodo opzionale per ottenere la quantità di un item specifico

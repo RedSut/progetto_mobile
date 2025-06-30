@@ -8,6 +8,7 @@ import '../../models/steps.dart';
 import 'bag_page.dart';
 import 'claim_rewards.dart';
 import 'stats_page.dart';
+import 'feed_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -135,7 +136,12 @@ class _HomePageState extends State<HomePage> {
 
             // pulsanti feed / rewards
             FilledButton(
-              onPressed: () => pet.feed(20),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const FeedPage()),
+                );
+              },
               style: FilledButton.styleFrom(
                 minimumSize: const Size(150, 44),
                 shape: RoundedRectangleBorder(
