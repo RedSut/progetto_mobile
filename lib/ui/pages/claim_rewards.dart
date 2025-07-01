@@ -236,7 +236,8 @@ class _RewardsPageState extends State<RewardsPage> {
                       bag.addItem(challenge.reward.item, challenge.reward.quantity);
 
                       setState(() {
-                        challenge.isClaimed = true;
+                        challengeManager.claimChallenge(challenge);
+                        //challenge.isClaimed = true;
                         _claimedChallenges.add(i);
                         _claimingChallenges.remove(i);
                       });

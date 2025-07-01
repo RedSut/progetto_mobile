@@ -7,7 +7,7 @@ import 'models/steps.dart';                                           // Modello
 import 'models/bag.dart';
 import 'ui/pages/home_page.dart';                                     // Pagina Home dell’app
 
-void main() {                                                         // Entry point dell’app
+void main() async {                                                   // Entry point dell’app
   runApp(const PetStepsApp());                                        // Avvia il widget radice PetStepsApp
 }
 

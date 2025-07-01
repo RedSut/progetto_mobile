@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';            // kDebugMode
 import 'package:flutter/material.dart';
+import 'package:progetto_mobile/models/challenge.dart';
+import 'package:progetto_mobile/models/storage_service.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/bag.dart';
 import '../../models/pet.dart';
 import '../../models/steps.dart';
 import 'bag_page.dart';
@@ -30,6 +33,14 @@ class _HomePageState extends State<HomePage> {
       context.read<StepsManager>().addSteps(100);
       context.read<Pet>().updateExp(100);
     });
+    //StorageService.clearAll(); // Serve per resettare i dati salvati
+    final stepsManager = Provider.of<StepsManager>(context, listen: false);
+    stepsManager.loadSteps();
+    final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
+    challengeManager.loadClaimedStatuses();
+    //challengeManager.resetClaimedChallenges(); // Serve per resettare lo stato di tutte le challenge
+    final bag = Provider.of<Bag>(context, listen: false);
+    bag.loadBag();
   }
 
   @override

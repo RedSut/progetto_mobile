@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:progetto_mobile/models/storage_service.dart';
 import 'item.dart';
 
 class Bag extends ChangeNotifier {
-  final Map<Item, int> items = {};
+  Map<Item, int> items = {};
 
   // Aggiunge un item alla borsa, incrementando la quantità se già presente
   void addItem(Item item, int quantity) {
@@ -11,6 +12,7 @@ class Bag extends ChangeNotifier {
     } else {
       items[item] = quantity;
     }
+    saveBag();
     notifyListeners();
   }
   // Rimuove un item dalla borsa, decrementando la quantità o eliminandolo se arriva a 0
@@ -25,6 +27,7 @@ class Bag extends ChangeNotifier {
     } else {
       items.remove(item);
     }
+    saveBag();
     notifyListeners();
     return true;
   }
@@ -32,5 +35,16 @@ class Bag extends ChangeNotifier {
   // Metodo opzionale per ottenere la quantità di un item specifico
   int getItemQuantity(Item item) {
     return items[item] ?? 0;
+  }
+
+  // Carica la bag
+  Future<void> loadBag() async {
+    items = await StorageService.getBag();
+    notifyListeners();
+  }
+
+  // Salva la bag
+  Future<void> saveBag() async {
+    StorageService.saveBag(items);
   }
 }

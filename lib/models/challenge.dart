@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:progetto_mobile/models/item.dart';
+import 'package:progetto_mobile/models/storage_service.dart';
 
 import 'reward.dart';
 
@@ -111,4 +112,27 @@ class ChallengeManager extends ChangeNotifier{
       steps: 100000,
     ),
   ];
+
+  Future<void> loadClaimedStatuses() async {
+    final claimedIds = await StorageService.getClaimedChallenges();
+    for (var challenge in challenges) {
+      challenge.isClaimed = claimedIds.contains(challenge.id);
+    }
+    notifyListeners();
+  }
+
+  void claimChallenge(Challenge challenge) async {
+    challenge.isClaimed = true;
+    final claimedIds = await StorageService.getClaimedChallenges();
+    claimedIds.add(challenge.id);
+    await StorageService.saveClaimedChallenges(claimedIds);
+    notifyListeners();
+  }
+
+  void resetClaimedChallenges(){
+    for (var challenge in challenges){
+      challenge.isClaimed = false;
+    }
+    notifyListeners();
+  }
 }

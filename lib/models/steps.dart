@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:progetto_mobile/models/storage_service.dart';
 import 'pet.dart';
 
 // TODO: da capire come linkare bene con pet, forse basta chiamare i due metodi ogni volta che si aggiornano i passi
@@ -26,20 +27,38 @@ class StepsManager extends ChangeNotifier {
     startMidnightTimer();
   }
 
+  // Carica il numero di passi salvato
+  Future<void> loadSteps() async {
+    _steps = await StorageService.getTotalSteps();
+    _dailySteps = await StorageService.getDailySteps();
+    _weeklySteps = await StorageService.getWeeklySteps();
+    notifyListeners();
+  }
+
+  // Salva il numero di passi
+  Future<void> saveSteps() async {
+    StorageService.saveTotalSteps(_steps);
+    StorageService.saveDailySteps(_dailySteps);
+    StorageService.saveWeeklySteps(_weeklySteps);
+  }
+
   void addSteps(int steps) {
     _steps += steps;
     _dailySteps += steps;
     _weeklySteps += steps;
+    saveSteps();
     notifyListeners(); // Notifica i widget ascoltatori per aggiornare la UI
   }
 
   void resetDailySteps() {
     _dailySteps = 0;
+    StorageService.saveDailySteps(_dailySteps);
     notifyListeners();
   }
 
   void resetWeeklySteps() {
     _weeklySteps = 0;
+    StorageService.saveWeeklySteps(_weeklySteps);
     notifyListeners();
   }
 

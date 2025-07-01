@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
+import 'package:progetto_mobile/models/pet.dart';
 import 'dart:math';
 import 'package:provider/provider.dart';
 
@@ -80,6 +81,7 @@ class _StatsPageState extends State<StatsPage> {
   Widget build(BuildContext context) {
     // Prendo l'istanza aggiornata di StepsManager da Provider
     final stepsManager = context.watch<StepsManager>();
+    final pet = Provider.of<Pet>(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFF688D92),
@@ -115,7 +117,7 @@ class _StatsPageState extends State<StatsPage> {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Image.asset(
-              'assets/mostro.png',
+              pet.imagePath,
               width: 60,
               height: 60,
             ),
