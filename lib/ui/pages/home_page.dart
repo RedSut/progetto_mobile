@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   bool _showStats = false;
   Timer? _mockStepTimer;
   int _previousLevel = -1;                          // livello precedente; -1 se non caricato
+  bool _hatchDialogShown = false;
 
   @override
   void initState() {
@@ -46,6 +47,8 @@ class _HomePageState extends State<HomePage> {
     final pet = Provider.of<Pet>(context, listen: false);
     // carica i dati del pet e imposta il livello corrente come riferimento
     pet.loadPet().then((_) => _previousLevel = pet.level);
+    // carica se il messaggio di schiusa è già stato mostrato
+    StorageService.getHatchShown().then((value) => _hatchDialogShown = value);
   }
 
   @override
@@ -60,36 +63,35 @@ class _HomePageState extends State<HomePage> {
     final stepsManager = context.watch<StepsManager>();
 
     // ─── Messaggio quando il pet passa da livello 0 a 1 ───
-    if (_previousLevel == 0 && pet.level == 1) {
-      if (_previousLevel != -1 && _previousLevel == 0 && pet.level == 1) {
+      if (!_hatchDialogShown &&
+          _previousLevel != -1 &&
+          _previousLevel == 0 &&
+          pet.level == 1) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           showDialog(
             context: context,
             barrierDismissible: true,
-            builder: (_) =>
-                AlertDialog(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
-                  contentPadding: const EdgeInsets.all(24),
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text('🎉 Evoluzione!', style: TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold)),
-                      SizedBox(height: 16),
-                      Text('Il tuo pet si è schiuso!',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(fontSize: 18)),
-                      SizedBox(height: 12),
-                      Text('Prenditene cura e fallo crescere! 🐣',
-                          textAlign: TextAlign.center),
-                    ],
-                  ),
-                ),
-          );
+            builder: (_) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              contentPadding: const EdgeInsets.all(24),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text('🎉 Evoluzione!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 16),
+                  Text('Il tuo pet si è schiuso!', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                  SizedBox(height: 12),
+                  Text('Prenditene cura e fallo crescere! 🐣', textAlign: TextAlign.center),
+                ],
+              ),
+            ),
+
+          ).then((_) {
+          _hatchDialogShown = true;
+          StorageService.saveHatchShown(true);
+          });
         });
       }
-    }
 
     _previousLevel = pet.level;
 

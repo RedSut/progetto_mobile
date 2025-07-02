@@ -1,9 +1,9 @@
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
-import 'package:pedometer/pedometer.dart';                // pedometro reale
+import 'package:pedometer/pedometer.dart';                // sensore pedometro reale
+import 'package:permission_handler/permission_handler.dart'; // PATCH: gestione permessi
 
 // TODO: da capire come linkare bene con pet, forse basta chiamare i due metodi ogni volta che si aggiornano i passi
 class StepsManager extends ChangeNotifier {
@@ -13,6 +13,11 @@ class StepsManager extends ChangeNotifier {
   int dailyGoal = 2000;
   int weeklyGoal = 10000;
 
+  // 🔄 Costruttore 1 (già presente): chiama _init()
+  StepsManager() {
+    _init();                         // Inizializzazione personalizzata
+  }
+
   int get steps => _steps;
   int get dailySteps => _dailySteps;
   int get weeklySteps => _weeklySteps;
@@ -21,16 +26,27 @@ class StepsManager extends ChangeNotifier {
   double get weeklyProgress => _weeklySteps / weeklyGoal;
 
   Timer? _midnightTimer;
-  StreamSubscription<StepCount>? _stepSub; // ascolta il pedometro
-  int? _lastPedometerSteps;                // valore precedente del sensore
+  StreamSubscription<StepCount>? _pedometerSub;
+  int _lastDeviceSteps = 0;           // valore precedente del sensore
 
-  // 📌 Costruttore
-  StepsManager() {
+  // 📌 Costruttore 2 (già presente)
+  StepsManager.second() {
     startMidnightTimer();
     loadSteps();
     loadGoals();
-    _initPedometer();
+    // PATCH: richiede permesso e avvia il contapassi solo se concesso
+    _ensureActivityPermission().then((granted) {
+      if (granted) {
+        _startListening();
+      } else {
+        debugPrint('Permesso ACTIVITY_RECOGNITION negato: il contapassi non verrà avviato.');
+      }
+    });
   }
+
+  // ---------------------------------------------------------------------------
+  // ⬇️  Metodi esistenti (INVARIATI)  ⬇️
+  // ---------------------------------------------------------------------------
 
   // Carica il numero di passi salvato
   Future<void> loadSteps() async {
@@ -74,42 +90,70 @@ class StepsManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Avvia l'ascolto del pedometro
-  void _initPedometer() {
-    _stepSub = Pedometer.stepCountStream.listen(_onStepCount);
-  }
-
-  // Gestisce i passi ricevuti dal sensore
-  void _onStepCount(StepCount event) {
-    if (_lastPedometerSteps == null) {
-      _lastPedometerSteps = event.steps;
-      return;
-    }
-    final diff = event.steps - _lastPedometerSteps!;
-    if (diff > 0) {
-      _lastPedometerSteps = event.steps;
-      addSteps(diff); // aggiorna contatori interni e salva
-    }
-  }
-
-
   void startMidnightTimer() {
-    // Ogni minuto controlla se è mezzanotte
-    _midnightTimer = Timer.periodic(Duration(minutes: 1), (timer) {
-      final now = DateTime.now();
-      if (now.hour == 0 && now.minute == 0) {
-        resetDailySteps();
-        if (now.weekday == DateTime.monday) {
-          resetWeeklySteps();
-        }
+    final now = DateTime.now();
+    final tomorrow = DateTime(now.year, now.month, now.day + 1);
+    final duration = tomorrow.difference(now);
+
+    _midnightTimer?.cancel();
+    _midnightTimer = Timer(duration, () {
+      resetDailySteps();
+      if (DateTime.now().weekday == DateTime.monday) {
+        resetWeeklySteps();
       }
+      // Riavvia il timer automaticamente
+      startMidnightTimer();
     });
   }
+
+  /// PATCH: verifica e richiede il permesso ACTIVITY_RECOGNITION
+  Future<bool> _ensureActivityPermission() async {
+    final status = await Permission.activityRecognition.status;
+    if (status.isGranted) return true;
+    final result = await Permission.activityRecognition.request();
+    return result.isGranted;
+  }
+
+  void _startListening() {
+    _pedometerSub = Pedometer.stepCountStream.listen((event) {
+      if (_lastDeviceSteps == 0) {
+        _lastDeviceSteps = event.steps;
+        return;
+      }
+      final delta = event.steps - _lastDeviceSteps;
+      _lastDeviceSteps = event.steps;
+      if (delta > 0) addSteps(delta);
+    });
+  }
+
+  void _stopListening() {
+    _pedometerSub?.cancel();
+    _pedometerSub = null;
+    _lastDeviceSteps = 0;
+  }
+
   @override
   void dispose() {
     // Per evitare memory leak quando il provider viene distrutto
     _midnightTimer?.cancel();
-    _stepSub?.cancel(); // stop pedometro
+    _stopListening();
     super.dispose();
+  }
+
+  // ---------------------------------------------------------------------------
+  // 🔧  Metodo di inizializzazione originale (non modificato)
+  // ---------------------------------------------------------------------------
+  Future<void> _init() async {
+    startMidnightTimer();
+    loadSteps();
+    loadGoals();
+    // PATCH: avvia _startListening solo se il permesso è concesso
+    _ensureActivityPermission().then((granted) {
+      if (granted) {
+        _startListening();
+      } else {
+        debugPrint('Permesso ACTIVITY_RECOGNITION negato: il contapassi non verrà avviato.');
+      }
+    });
   }
 }

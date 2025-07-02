@@ -21,8 +21,10 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>$(FLUTTER_BUILD_NUMBER)</string>
-	<key>LSRequiresIPhoneOS</key>
+    <string>$(FLUTTER_BUILD_NUMBER)</string>
+    <key>NSMotionUsageDescription</key>
+    <string>Questo permette di contare i passi.</string>
+    <key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>

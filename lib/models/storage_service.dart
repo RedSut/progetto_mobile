@@ -46,6 +46,17 @@ class StorageService {
     return prefs.getBool('petIsEgg') ?? true;
   }
 
+  // 📌 Memorizza se il messaggio di schiusa è già stato mostrato
+  static Future<void> saveHatchShown(bool shown) async {
+    final prefs = await _prefs;
+    prefs.setBool('hatchShown', shown);
+  }
+
+  static Future<bool> getHatchShown() async {
+    final prefs = await _prefs;
+    return prefs.getBool('hatchShown') ?? false;
+  }
+
   static Future<int> getWeeklySteps() async {
     final prefs = await _prefs;
     return prefs.getInt('weeklySteps') ?? 0;
