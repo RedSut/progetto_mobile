@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';            // kDebugMode
 import 'package:flutter/material.dart';
 import 'package:progetto_mobile/models/challenge.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
+import 'package:progetto_mobile/ui/pages/settings_page.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/bag.dart';
@@ -36,6 +37,7 @@ class _HomePageState extends State<HomePage> {
     //StorageService.clearAll(); // Serve per resettare i dati salvati
     final stepsManager = Provider.of<StepsManager>(context, listen: false);
     stepsManager.loadSteps();
+    stepsManager.loadGoals();
     final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
     challengeManager.loadClaimedStatuses();
     //challengeManager.resetClaimedChallenges(); // Serve per resettare lo stato di tutte le challenge
@@ -289,7 +291,12 @@ class _AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
-            onTap: () {/* TODO */},
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsPage()),
+              );
+            },
           ),
         ],
       ),

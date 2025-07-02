@@ -25,6 +25,8 @@ class StepsManager extends ChangeNotifier {
   // 📌 Costruttore
   StepsManager() {
     startMidnightTimer();
+    loadSteps();
+    loadGoals();
   }
 
   // Carica il numero di passi salvato
@@ -40,6 +42,13 @@ class StepsManager extends ChangeNotifier {
     StorageService.saveTotalSteps(_steps);
     StorageService.saveDailySteps(_dailySteps);
     StorageService.saveWeeklySteps(_weeklySteps);
+  }
+
+  // 📦 Carica gli obiettivi salvati
+  Future<void> loadGoals() async {
+    dailyGoal = await StorageService.getDailyGoal();
+    weeklyGoal = await StorageService.getWeeklyGoal();
+    notifyListeners();
   }
 
   void addSteps(int steps) {

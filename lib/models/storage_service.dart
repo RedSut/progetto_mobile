@@ -80,6 +80,28 @@ class StorageService {
     return prefs.getStringList('claimedChallenges') ?? [];
   }
 
+  // 📌 Salva il dayly goal
+  static Future<void> saveDailyGoal(int goal) async {
+    final prefs = await _prefs;
+    prefs.setInt('dailyGoal', goal);
+  }
+
+  static Future<int> getDailyGoal() async {
+    final prefs = await _prefs;
+    return prefs.getInt('dailyGoal') ?? 2000; // valore di default
+  }
+
+  // 📌 Salva il weekly goal
+  static Future<void> saveWeeklyGoal(int goal) async {
+    final prefs = await _prefs;
+    prefs.setInt('weeklyGoal', goal);
+  }
+
+  static Future<int> getWeeklyGoal() async {
+    final prefs = await _prefs;
+    return prefs.getInt('weeklyGoal') ?? 10000; // valore di default
+  }
+
   // 📌 Funzione per resettare tutto (debug/reset)
   static Future<void> clearAll() async {
     final prefs = await _prefs;

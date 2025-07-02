@@ -88,6 +88,7 @@ class _RewardsPageState extends State<RewardsPage> {
     required bool isClaiming,
     required bool isClaimed,
     required String duration,
+    required String description,
   }) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 12), // Spaziatura verticale
@@ -110,7 +111,7 @@ class _RewardsPageState extends State<RewardsPage> {
           const SizedBox(height: 8), // Spaziatura
           // Descrizione obiettivo
           Text(
-            challenge.description,
+            description,
             style: const TextStyle(color: Colors.white70),
           ),
           const SizedBox(height: 12),
@@ -207,6 +208,8 @@ class _RewardsPageState extends State<RewardsPage> {
               for (int i = 0; i < challengeManager.challenges.length; i++)
                 (() {
                   final challenge = challengeManager.challenges[i];
+                  final stepsTarget = challenge.getStepsTarget(stepsManager);
+                  final description = challenge.getDescription(stepsManager);
                   double progress;
                   String duration = "";
                   if (i == 0) {
@@ -216,10 +219,11 @@ class _RewardsPageState extends State<RewardsPage> {
                     progress = stepsManager.weeklyProgress.clamp(0.0, 1.0);
                     duration = '- ${_formatDuration(weeklyRemaining)}';
                   } else {
-                    progress = (stepsManager.steps / challenge.steps).clamp(0.0, 1.0);
+                    progress = (stepsManager.steps / stepsTarget).clamp(0.0, 1.0);
                   }
 
                   return _buildChallenge(
+                    description: description,
                     duration: duration,
                     challenge: challenge,
                     progress: progress,
