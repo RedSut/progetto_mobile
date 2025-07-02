@@ -90,7 +90,7 @@ class _FeedPageState extends State<FeedPage> {
           Column(
             children: [
               Text(
-                pet.level == 0 ? '🥚' : '😺',
+                pet.isEgg ? '🥚' : '😺',
                 style: const TextStyle(fontSize: 72),
               ),
               const SizedBox(height: 8),

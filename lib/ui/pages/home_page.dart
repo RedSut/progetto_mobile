@@ -24,7 +24,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _showStats = false;
   Timer? _mockStepTimer;
-  int _previousLevel = 0;                           // ← nuovo
+  int _previousLevel = -1;                          // livello precedente; -1 se non caricato
 
   @override
   void initState() {
@@ -43,6 +43,9 @@ class _HomePageState extends State<HomePage> {
     //challengeManager.resetClaimedChallenges(); // Serve per resettare lo stato di tutte le challenge
     final bag = Provider.of<Bag>(context, listen: false);
     bag.loadBag();
+    final pet = Provider.of<Pet>(context, listen: false);
+    // carica i dati del pet e imposta il livello corrente come riferimento
+    pet.loadPet().then((_) => _previousLevel = pet.level);
   }
 
   @override
@@ -58,26 +61,34 @@ class _HomePageState extends State<HomePage> {
 
     // ─── Messaggio quando il pet passa da livello 0 a 1 ───
     if (_previousLevel == 0 && pet.level == 1) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        showDialog(
-          context: context,
-          barrierDismissible: true,
-          builder: (_) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            contentPadding: const EdgeInsets.all(24),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text('🎉 Evoluzione!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                SizedBox(height: 16),
-                Text('Il tuo pet si è schiuso!', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
-                SizedBox(height: 12),
-                Text('Prenditene cura e fallo crescere! 🐣', textAlign: TextAlign.center),
-              ],
-            ),
-          ),
-        );
-      });
+      if (_previousLevel != -1 && _previousLevel == 0 && pet.level == 1) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          showDialog(
+            context: context,
+            barrierDismissible: true,
+            builder: (_) =>
+                AlertDialog(
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
+                  contentPadding: const EdgeInsets.all(24),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Text('🎉 Evoluzione!', style: TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold)),
+                      SizedBox(height: 16),
+                      Text('Il tuo pet si è schiuso!',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 18)),
+                      SizedBox(height: 12),
+                      Text('Prenditene cura e fallo crescere! 🐣',
+                          textAlign: TextAlign.center),
+                    ],
+                  ),
+                ),
+          );
+        });
+      }
     }
 
     _previousLevel = pet.level;
@@ -103,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                     radius: 80,
                     backgroundColor: Colors.indigo.shade100,
                     child: Text(
-                      pet.level == 0 ? '🥚' : '😺',
+                      pet.isEgg ? '🥚' : '😺',
                       style: const TextStyle(fontSize: 64),
                     ),
                   ),

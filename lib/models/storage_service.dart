@@ -24,6 +24,28 @@ class StorageService {
     prefs.setInt('weeklySteps', steps);
   }
 
+  // 📌 Salva il livello del pet
+  static Future<void> savePetLevel(int level) async {
+    final prefs = await _prefs;
+    prefs.setInt('petLevel', level);
+  }
+
+  static Future<int> getPetLevel() async {
+    final prefs = await _prefs;
+    return prefs.getInt('petLevel') ?? 0;
+  }
+
+  // 📌 Salva se il pet è ancora un uovo
+  static Future<void> savePetIsEgg(bool isEgg) async {
+    final prefs = await _prefs;
+    prefs.setBool('petIsEgg', isEgg);
+  }
+
+  static Future<bool> getPetIsEgg() async {
+    final prefs = await _prefs;
+    return prefs.getBool('petIsEgg') ?? true;
+  }
+
   static Future<int> getWeeklySteps() async {
     final prefs = await _prefs;
     return prefs.getInt('weeklySteps') ?? 0;

@@ -3,7 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
-import 'pet.dart';
+import 'package:pedometer/pedometer.dart';                // pedometro reale
 
 // TODO: da capire come linkare bene con pet, forse basta chiamare i due metodi ogni volta che si aggiornano i passi
 class StepsManager extends ChangeNotifier {
@@ -21,12 +21,15 @@ class StepsManager extends ChangeNotifier {
   double get weeklyProgress => _weeklySteps / weeklyGoal;
 
   Timer? _midnightTimer;
+  StreamSubscription<StepCount>? _stepSub; // ascolta il pedometro
+  int? _lastPedometerSteps;                // valore precedente del sensore
 
   // 📌 Costruttore
   StepsManager() {
     startMidnightTimer();
     loadSteps();
     loadGoals();
+    _initPedometer();
   }
 
   // Carica il numero di passi salvato
@@ -71,6 +74,25 @@ class StepsManager extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Avvia l'ascolto del pedometro
+  void _initPedometer() {
+    _stepSub = Pedometer.stepCountStream.listen(_onStepCount);
+  }
+
+  // Gestisce i passi ricevuti dal sensore
+  void _onStepCount(StepCount event) {
+    if (_lastPedometerSteps == null) {
+      _lastPedometerSteps = event.steps;
+      return;
+    }
+    final diff = event.steps - _lastPedometerSteps!;
+    if (diff > 0) {
+      _lastPedometerSteps = event.steps;
+      addSteps(diff); // aggiorna contatori interni e salva
+    }
+  }
+
+
   void startMidnightTimer() {
     // Ogni minuto controlla se è mezzanotte
     _midnightTimer = Timer.periodic(Duration(minutes: 1), (timer) {
@@ -87,6 +109,7 @@ class StepsManager extends ChangeNotifier {
   void dispose() {
     // Per evitare memory leak quando il provider viene distrutto
     _midnightTimer?.cancel();
+    _stepSub?.cancel(); // stop pedometro
     super.dispose();
   }
 }
