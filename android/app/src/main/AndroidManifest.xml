@@ -2,6 +2,7 @@
     android:versionCode="0"
     android:versionName="0.0.1">
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
     <application
         android:label="progetto_mobile"
         android:name="${applicationName}"

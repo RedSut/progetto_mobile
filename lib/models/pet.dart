@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';            // Necessario per ChangeNotifier
+import 'package:permission_handler/permission_handler.dart';
 import 'notification_service.dart';
 import 'storage_service.dart';
 
@@ -66,16 +67,30 @@ class Pet extends ChangeNotifier {
     notifyListeners();
   }
 
-  void _checkPetStatus() {
-    if (hunger < 30) {
-      NotificationService().showNotification(
-          'Il tuo pet ha fame!', 'Vai a dargli da mangiare!'
-      );
-    }
-    if (happiness < 30) {
-      NotificationService().showNotification(
-          'Il tuo pet è triste!', 'Fallo giocare un po\'!'
-      );
-    }
+  /// PATCH: verifica e richiede il permesso ACTIVITY_RECOGNITION
+  Future<bool> _ensureNotificationPermission() async {
+    final status = await Permission.notification.status;
+    if (status.isGranted) return true;
+    final result = await Permission.notification.request();
+    return result.isGranted;
+  }
+
+  Future<void> _checkPetStatus() async {
+    _ensureNotificationPermission().then((granted) {
+      if (granted) {
+        if (hunger < 30) {
+          NotificationService().showNotification(
+              'Il tuo pet ha fame!', 'Vai a dargli da mangiare!'
+          );
+        }
+        if (happiness < 30) {
+          NotificationService().showNotification(
+              'Il tuo pet è triste!', 'Fallo giocare un po\'!'
+          );
+        }
+      } else {
+        debugPrint('Permesso NOTIFICATION negato: le notifiche non verranno mostrate.');
+      }
+    });
   }
 }
