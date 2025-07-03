@@ -2,12 +2,15 @@ import 'package:flutter/material.dart';                               // Widget 
 import 'package:progetto_mobile/models/challenge.dart';
 import 'package:provider/provider.dart';                              // Provider per dependency injection e stato
 
+import 'models/notification_service.dart';
 import 'models/pet.dart';                                             // Modello Pet (logica di gioco)
 import 'models/steps.dart';                                           // Modello StepsManager (logica per i passi)
 import 'models/bag.dart';
 import 'ui/pages/home_page.dart';                                     // Pagina Home dell’app
 
 void main() async {                                                   // Entry point dell’app
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().init();
   runApp(const PetStepsApp());                                        // Avvia il widget radice PetStepsApp
 }
 

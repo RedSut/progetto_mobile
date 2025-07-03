@@ -1,4 +1,3 @@
-import 'package:progetto_mobile/models/storage_service.dart';
 
 class Item{
   final String id;

@@ -46,6 +46,37 @@ class StorageService {
     return prefs.getBool('petIsEgg') ?? true;
   }
 
+  // 📌 Salva l'ultimo aggiornamento dei valori del pet
+  static Future<void> savePetLastUpdated(DateTime lastUpdated) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('lastUpdated', lastUpdated.toIso8601String());
+  }
+
+  static Future<DateTime> getPetLastUpdated() async {
+    final prefs = await _prefs;
+    return DateTime.tryParse(prefs.getString('lastUpdated') ?? '') ?? DateTime.now();
+  }
+
+  static Future<void> savePetHunger(int fame) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('petHunger', fame);
+  }
+
+  static Future<int> getPetHunger() async {
+    final prefs = await _prefs;
+    return prefs.getInt('petHunger') ?? 100;
+  }
+
+  static Future<void> savePetHappiness(int felicita) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('petHappyness', felicita);
+  }
+
+  static Future<int> getPetHappiness() async {
+    final prefs = await _prefs;
+    return prefs.getInt('petHappyness') ?? 100;
+  }
+
   // 📌 Memorizza se il messaggio di schiusa è già stato mostrato
   static Future<void> saveHatchShown(bool shown) async {
     final prefs = await _prefs;

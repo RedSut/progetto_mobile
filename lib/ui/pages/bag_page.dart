@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/bag.dart';
 
 class BagPage extends StatelessWidget {
-  BagPage({super.key});
+  const BagPage({super.key});
 
   @override
   Widget build(BuildContext context) {

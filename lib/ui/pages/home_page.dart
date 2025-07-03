@@ -30,11 +30,6 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // simulazione passi (rimuovere quando integrate il pedometro)
-    _mockStepTimer = Timer.periodic(const Duration(seconds: 10), (_) {
-      context.read<StepsManager>().addSteps(100);
-      context.read<Pet>().updateExp(100);
-    });
     //StorageService.clearAll(); // Serve per resettare i dati salvati
     final stepsManager = Provider.of<StepsManager>(context, listen: false);
     stepsManager.loadSteps();

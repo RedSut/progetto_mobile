@@ -1,42 +1,58 @@
 import 'package:flutter/material.dart';            // Necessario per ChangeNotifier
+import 'notification_service.dart';
 import 'storage_service.dart';
 
 class Pet extends ChangeNotifier {
-  int level      = 0;
-  int hunger     = 100;
-  int happiness  = 100;
-  bool isEgg     = true;
+  int level = 0;
+  int hunger = 100;
+  int happiness = 100;
+  bool isEgg = true;
 
-  int _xp = 0;                     // esperienza accumulata
-
-  String imagePath = 'assets/mostro.png'; //TODO: da mettere l'immagine del pet ed aggiornarla alla schiusura
+  int _xp = 0;
+  String imagePath = 'assets/mostro.png';
+  DateTime lastUpdated = DateTime.now();
 
   Future<void> loadPet() async {
-    level  = await StorageService.getPetLevel();
-    isEgg  = await StorageService.getPetIsEgg();
+    level = await StorageService.getPetLevel();
+    isEgg = await StorageService.getPetIsEgg();
+    hunger = await StorageService.getPetHunger();
+    happiness = await StorageService.getPetHappiness();
+    lastUpdated = await StorageService.getPetLastUpdated();
+
+    _updateStatsFromTime();  // Appena caricati, aggiorna valori da tempo passato
     notifyListeners();
   }
 
   Future<void> savePet() async {
     await StorageService.savePetLevel(level);
     await StorageService.savePetIsEgg(isEgg);
+    await StorageService.savePetHunger(hunger);
+    await StorageService.savePetHappiness(happiness);
+    await StorageService.savePetLastUpdated(lastUpdated);
   }
 
-  /// Aggiunge [amount] passi/XP e gestisce il livello (max 100)
+  void _updateStatsFromTime() {
+    final now = DateTime.now();
+    final elapsedMinutes = now.difference(lastUpdated).inMinutes;
+
+    if (elapsedMinutes > 0) {
+      hunger = (hunger - elapsedMinutes).clamp(0, 100);
+      happiness = (happiness - (elapsedMinutes / 2).round()).clamp(0, 100);
+      lastUpdated = now;
+      savePet();
+      _checkPetStatus();
+    }
+  }
+
   void updateExp(int amount) {
-    if (level >= 100) return;      // già al massimo → esci
+    if (level >= 100) return;
 
     _xp += amount;
-
-    // Converte 1000 XP = +1 livello finché resta XP e level < 100
     while (_xp >= 1000 && level < 100) {
       _xp -= 1000;
       level++;
     }
-
     if (level > 0) isEgg = false;
-
-    // Se si è appena raggiunto il livello 100, azzera l’XP residuo
     if (level >= 100) _xp = 0;
 
     savePet();
@@ -44,8 +60,22 @@ class Pet extends ChangeNotifier {
   }
 
   void feed(int foodValue) {
-    hunger     = (hunger    + foodValue      ).clamp(0, 100);
-    happiness  = (happiness + foodValue ~/ 2 ).clamp(0, 100);
+    hunger = (hunger + foodValue).clamp(0, 100);
+    happiness = (happiness + (foodValue ~/ 2)).clamp(0, 100);
+    savePet();
     notifyListeners();
+  }
+
+  void _checkPetStatus() {
+    if (hunger < 30) {
+      NotificationService().showNotification(
+          'Il tuo pet ha fame!', 'Vai a dargli da mangiare!'
+      );
+    }
+    if (happiness < 30) {
+      NotificationService().showNotification(
+          'Il tuo pet è triste!', 'Fallo giocare un po\'!'
+      );
+    }
   }
 }
