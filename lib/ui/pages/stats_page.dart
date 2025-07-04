@@ -110,32 +110,34 @@ class _StatsPageState extends State<StatsPage> {
           ),
         ),
       ),
-      bottomNavigationBar: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        color: const Color(0xFF688D92),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
+      bottomNavigationBar: SafeArea(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          color: const Color(0xFF688D92),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
             Image.asset(
-              pet.imagePath,
-              width: 60,
-              height: 60,
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Text(
-                  currentPhrase,
-                  style: const TextStyle(fontSize: 16),
+            pet.imagePath,
+            width: 60,
+            height: 60,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                currentPhrase,
+                style: const TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

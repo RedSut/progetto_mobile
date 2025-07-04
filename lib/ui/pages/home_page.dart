@@ -37,12 +37,6 @@ class _HomePageState extends State<HomePage> {
     final stepsManager = Provider.of<StepsManager>(context, listen: false);
     await stepsManager.loadSteps();
     await stepsManager.loadGoals();
-    stepsManager.startForegroundService().then((started) {
-      if (!started) {
-        // Gestisci errore, mostra alert o log
-        print('Errore: Foreground service non avviato');
-      }
-    });
 
     final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
     await challengeManager.loadClaimedStatuses();

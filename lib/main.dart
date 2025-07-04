@@ -2,42 +2,14 @@ import 'package:flutter/material.dart';                               // Widget 
 import 'package:progetto_mobile/models/challenge.dart';
 import 'package:provider/provider.dart';                              // Provider per dependency injection e stato
 
-import 'models/foreground_helper.dart';
 import 'models/notification_service.dart';
 import 'models/pet.dart';                                             // Modello Pet (logica di gioco)
 import 'models/steps.dart';                                           // Modello StepsManager (logica per i passi)
 import 'models/bag.dart';
 import 'ui/pages/home_page.dart';                                     // Pagina Home dell’app
 
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
-
-// Task per il conteggio dei passi in background
-void startCallback() {
-  FlutterForegroundTask.setTaskHandler(StepForegroundTaskHandler());
-}
-
 void main() async {                                                   // Entry point dell’app
-  // Creazione task per il conteggio dei passi in background
-  FlutterForegroundTask.init(
-    androidNotificationOptions: AndroidNotificationOptions(
-      channelId: 'steps_channel',
-      channelName: 'Step Counter',
-      channelDescription: 'Conteggio passi in background',
-      iconData: const NotificationIconData(
-        resType: ResourceType.mipmap,
-        resPrefix: ResourcePrefix.ic,
-        name: 'launcher',
-      ),
-    ),
-    iosNotificationOptions: const IOSNotificationOptions(
-      showNotification: false, // Nasconde la notifica su iOS (non usata)
-    ),
-    foregroundTaskOptions: const ForegroundTaskOptions(
-      interval: 5000,
-      autoRunOnBoot: true, // Inizia a contare anche dopo il riavvio del dispositivo
-      allowWakeLock: true,
-    ),
-  );
+
   WidgetsFlutterBinding.ensureInitialized();
   await NotificationService().init();
   runApp(const PetStepsApp());                                        // Avvia il widget radice PetStepsApp

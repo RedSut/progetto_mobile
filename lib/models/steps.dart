@@ -1,13 +1,9 @@
 import 'dart:async';
-import 'dart:isolate';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
 import 'package:pedometer/pedometer.dart';                // sensore pedometro reale
 import 'package:permission_handler/permission_handler.dart';
-
-import '../main.dart'; // PATCH: gestione permessi
 
 // TODO: da capire come linkare bene con pet, forse basta chiamare i due metodi ogni volta che si aggiornano i passi
 class StepsManager extends ChangeNotifier {
@@ -16,8 +12,6 @@ class StepsManager extends ChangeNotifier {
   int _weeklySteps = 0;
   int dailyGoal = 2000;
   int weeklyGoal = 10000;
-  ReceivePort? _receivePort; // per i passi in background
-  StreamSubscription? _receivePortSub;
 
   // 🔄 Costruttore 1 (già presente): chiama _init()
   StepsManager() {
@@ -143,68 +137,7 @@ class StepsManager extends ChangeNotifier {
     // Per evitare memory leak quando il provider viene distrutto
     _midnightTimer?.cancel();
     _stopListening();
-    // Ferma servizio se in esecuzione e libera risorse
-    stopForegroundService();
     super.dispose();
-  }
-
-  // ---------------------------------------------------------------------------
-  //  Metodi per la gestione dei passi in background
-  // ---------------------------------------------------------------------------
-  Future<void> startBackgroundServiceSteps() async {
-    await _requestPermissionsBackground();
-    await startForegroundService();
-  }
-
-  Future<void> _requestPermissionsBackground() async {
-    var status = await Permission.activityRecognition.status;
-    if (!status.isGranted) {
-      await Permission.activityRecognition.request();
-    }
-  }
-
-  // Metodo per richiedere permessi e avviare il servizio
-  Future<bool> startForegroundService() async {
-    bool perms = await checkAndRequestPermissions();
-    if (perms){
-      bool started = await FlutterForegroundTask.startService(
-        notificationTitle: 'PetSteps attivo',
-        notificationText: 'Sto contando i tuoi passi!',
-        callback: startCallback,
-      );
-      return started;
-    }
-    return false;
-  }
-
-  // Richiesta permessi
-  Future<bool> checkAndRequestPermissions() async {
-    // Activity Recognition
-    var activityStatus = await Permission.activityRecognition.status;
-    if (!activityStatus.isGranted) {
-      activityStatus = await Permission.activityRecognition.request();
-      if (!activityStatus.isGranted) return false;
-    }
-
-    // Notifiche su Android 13+
-    if (await Permission.notification.isDenied) {
-      var notificationStatus = await Permission.notification.request();
-      if (!notificationStatus.isGranted) return false;
-    }
-
-    return true;
-  }
-
-  // Metodo per fermare il servizio e pulire risorse
-  Future<void> stopForegroundService() async {
-    if (await FlutterForegroundTask.isRunningService) {
-      await FlutterForegroundTask.stopService();
-    }
-
-    // Cancella subscription e ricevePort
-    await _receivePortSub?.cancel();
-    _receivePortSub = null;
-    _receivePort = null;
   }
 
   // ---------------------------------------------------------------------------
