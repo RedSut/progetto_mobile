@@ -1,3 +1,4 @@
+[![Codemagic build status](https://api.codemagic.io/apps/6867a3a3bdaba41a4c156bd3/6867a3a3bdaba41a4c156bd2/status_badge.svg)](https://codemagic.io/app/6867a3a3bdaba41a4c156bd3/6867a3a3bdaba41a4c156bd2/latest_build)
 # progetto_mobile
 
 Progetto mobile programming
