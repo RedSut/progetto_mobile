@@ -30,23 +30,38 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    //StorageService.clearAll(); // Serve per resettare i dati salvati
-    final stepsManager = Provider.of<StepsManager>(context, listen: false);
-    stepsManager.loadSteps();
-    stepsManager.loadGoals();
-    // Avvia il servizio per i passi in background all’avvio della HomePage
-    stepsManager.startBackgroundServiceSteps();
-    final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
-    challengeManager.loadClaimedStatuses();
-    //challengeManager.resetClaimedChallenges(); // Serve per resettare lo stato di tutte le challenge
-    final bag = Provider.of<Bag>(context, listen: false);
-    bag.loadBag();
-    final pet = Provider.of<Pet>(context, listen: false);
-    // carica i dati del pet e imposta il livello corrente come riferimento
-    pet.loadPet().then((_) => _previousLevel = pet.level);
-    // carica se il messaggio di schiusa è già stato mostrato
-    StorageService.getHatchShown().then((value) => _hatchDialogShown = value);
+    _initAsync();
   }
+
+  Future<void> _initAsync() async {
+    final stepsManager = Provider.of<StepsManager>(context, listen: false);
+    await stepsManager.loadSteps();
+    await stepsManager.loadGoals();
+    stepsManager.startForegroundService().then((started) {
+      if (!started) {
+        // Gestisci errore, mostra alert o log
+        print('Errore: Foreground service non avviato');
+      }
+    });
+
+    final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
+    await challengeManager.loadClaimedStatuses();
+
+    final bag = Provider.of<Bag>(context, listen: false);
+    await bag.loadBag();
+
+    final pet = Provider.of<Pet>(context, listen: false);
+    await pet.loadPet();
+    setState(() {
+      _previousLevel = pet.level;
+    });
+
+    final hatchShown = await StorageService.getHatchShown();
+    setState(() {
+      _hatchDialogShown = hatchShown;
+    });
+  }
+
 
   @override
   void dispose() {

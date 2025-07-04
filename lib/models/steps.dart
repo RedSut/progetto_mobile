@@ -17,6 +17,7 @@ class StepsManager extends ChangeNotifier {
   int dailyGoal = 2000;
   int weeklyGoal = 10000;
   ReceivePort? _receivePort; // per i passi in background
+  StreamSubscription? _receivePortSub;
 
   // 🔄 Costruttore 1 (già presente): chiama _init()
   StepsManager() {
@@ -142,6 +143,8 @@ class StepsManager extends ChangeNotifier {
     // Per evitare memory leak quando il provider viene distrutto
     _midnightTimer?.cancel();
     _stopListening();
+    // Ferma servizio se in esecuzione e libera risorse
+    stopForegroundService();
     super.dispose();
   }
 
@@ -160,29 +163,48 @@ class StepsManager extends ChangeNotifier {
     }
   }
 
-  Future<void> startForegroundService() async {
-    if (await FlutterForegroundTask.isRunningService) return;
-
-    bool started = await FlutterForegroundTask.startService(
-      notificationTitle: 'PetSteps attivo',
-      notificationText: 'Sto contando i tuoi passi!',
-      callback: startCallback,
-    );
-
-    if (started) {
-      _receivePort = FlutterForegroundTask.receivePort;
-      _receivePort?.listen((data) {
-        _steps = data as int;
-        notifyListeners();
-      });
+  // Metodo per richiedere permessi e avviare il servizio
+  Future<bool> startForegroundService() async {
+    bool perms = await checkAndRequestPermissions();
+    if (perms){
+      bool started = await FlutterForegroundTask.startService(
+        notificationTitle: 'PetSteps attivo',
+        notificationText: 'Sto contando i tuoi passi!',
+        callback: startCallback,
+      );
+      return started;
     }
+    return false;
   }
 
+  // Richiesta permessi
+  Future<bool> checkAndRequestPermissions() async {
+    // Activity Recognition
+    var activityStatus = await Permission.activityRecognition.status;
+    if (!activityStatus.isGranted) {
+      activityStatus = await Permission.activityRecognition.request();
+      if (!activityStatus.isGranted) return false;
+    }
 
+    // Notifiche su Android 13+
+    if (await Permission.notification.isDenied) {
+      var notificationStatus = await Permission.notification.request();
+      if (!notificationStatus.isGranted) return false;
+    }
+
+    return true;
+  }
+
+  // Metodo per fermare il servizio e pulire risorse
   Future<void> stopForegroundService() async {
     if (await FlutterForegroundTask.isRunningService) {
       await FlutterForegroundTask.stopService();
     }
+
+    // Cancella subscription e ricevePort
+    await _receivePortSub?.cancel();
+    _receivePortSub = null;
+    _receivePort = null;
   }
 
   // ---------------------------------------------------------------------------

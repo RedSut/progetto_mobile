@@ -17,8 +17,6 @@ void startCallback() {
 }
 
 void main() async {                                                   // Entry point dell’app
-  WidgetsFlutterBinding.ensureInitialized();
-  await NotificationService().init();
   // Creazione task per il conteggio dei passi in background
   FlutterForegroundTask.init(
     androidNotificationOptions: AndroidNotificationOptions(
@@ -40,6 +38,8 @@ void main() async {                                                   // Entry p
       allowWakeLock: true,
     ),
   );
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationService().init();
   runApp(const PetStepsApp());                                        // Avvia il widget radice PetStepsApp
 }
 
