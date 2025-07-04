@@ -28,20 +28,20 @@ class ItemManager{
   final List<Item> items = [
     const Item(
       id: 'it_001',
-      name: 'peach',
-      imagePath: 'assets/peach.png',
+      name: 'Pecha',
+      imagePath: 'assets/itemPecha.png',
       feedValue: 20,
     ),
     const Item(
       id: 'it_002',
-      name: 'carrot',
-      imagePath: 'assets/carrot.png',
+      name: 'Leppa',
+      imagePath: 'assets/itemLeppa.png',
       feedValue: 15,
     ),
     const Item(
       id: 'it_003',
-      name: 'strawberry',
-      imagePath: 'assets/strawberry.png',
+      name: 'Rowap',
+      imagePath: 'assets/itemRowap.png',
       feedValue: 10,
     ),
   ];

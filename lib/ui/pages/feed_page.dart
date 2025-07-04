@@ -89,9 +89,10 @@ class _FeedPageState extends State<FeedPage> {
           const SizedBox(height: 24),
           Column(
             children: [
-              Text(
-                pet.isEgg ? '🥚' : '😺',
-                style: const TextStyle(fontSize: 72),
+              Image.asset(
+                pet.isEgg ? 'assets/egg.png' : 'assets/Monster.png',
+                width: 240,
+                height: 240,
               ),
               const SizedBox(height: 8),
               Text(

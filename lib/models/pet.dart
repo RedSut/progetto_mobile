@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';            // Necessario per ChangeNotifier
+import 'dart:async';
 import 'package:permission_handler/permission_handler.dart';
 import 'notification_service.dart';
 import 'storage_service.dart';
@@ -13,10 +14,12 @@ class Pet extends ChangeNotifier {
   int happiness = 100;
   bool isEgg = true;
 
+  Timer? _happinessTimer;
+
   int _xp = 0;
   int get xp => _xp;
 
-  String imagePath = 'assets/mostro.png';
+  String imagePath = 'assets/egg.png';
   DateTime lastUpdated = DateTime.now();
 
   Future<void> loadPet() async {
@@ -50,15 +53,41 @@ class Pet extends ChangeNotifier {
       lastUpdated = now;
       savePet();
       _checkPetStatus();
+      _updateHappinessTimer();
     }
   }
 
   void _decreaseHunger(int minutes) {
     hunger = (hunger - minutes).clamp(0, 100);
+    _updateHappinessTimer();
   }
 
   void _decreaseHappiness(int minutes) {
     happiness = (happiness - (minutes / 2).round()).clamp(0, 100);
+  }
+
+  void _updateHappinessTimer() {
+    if (hunger < 50) {
+      _happinessTimer ??= Timer.periodic(const Duration(seconds: 1), (_) {
+        if (hunger < 50) {
+          happiness = (happiness - 1).clamp(0, 100);
+          savePet();
+          notifyListeners();
+        }
+      });
+    } else {
+      _happinessTimer?.cancel();
+      _happinessTimer = null;
+    }
+  }
+
+  void applySteps(int steps) {
+    hunger = (hunger - (steps * 2)).clamp(0, 100);
+    happiness = (happiness + steps).clamp(0, 100);
+    _updateHappinessTimer();
+    lastUpdated = DateTime.now();
+    savePet();
+    notifyListeners();
   }
 
   void updateExp(int amount) {
@@ -69,7 +98,10 @@ class Pet extends ChangeNotifier {
       _xp -= xpPerLevel;
       level++;
     }
-    if (level > 0) isEgg = false;
+    if (level > 0) {
+      isEgg = false;
+      imagePath = 'assets/Monster.png';
+    }
     if (level >= 100) _xp = 0;
 
     savePet();
@@ -79,6 +111,7 @@ class Pet extends ChangeNotifier {
   void feed(int foodValue) {
     hunger = (hunger + foodValue).clamp(0, 100);
     happiness = (happiness + (foodValue ~/ 2)).clamp(0, 100);
+    _updateHappinessTimer();
     savePet();
     notifyListeners();
   }
@@ -111,10 +144,17 @@ class Pet extends ChangeNotifier {
     hunger = 100;
     happiness = 100;
     isEgg = true;
-    imagePath = 'assets/mostro.png';
+    imagePath = 'assets/egg.png';
     lastUpdated = DateTime.now();
+    _updateHappinessTimer();
     await savePet();
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _happinessTimer?.cancel();
+    super.dispose();
   }
 
 }

@@ -78,7 +78,11 @@ flutter:
     - assets/peach.png
     - assets/carrot.png
     - assets/strawberry.png
-    - assets/mostro.png
+    - assets/Monster.png
+    - assets/egg.png
+    - assets/itemLeppa.png
+    - assets/itemPecha.png
+    - assets/itemRowap.png
 
   # To add custom fonts to your application, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a

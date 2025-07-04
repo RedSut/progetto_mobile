@@ -29,3 +29,9 @@ la loro quantità. Nella parte inferiore c'è il mostriciattolo che cerca di inc
 frasi motivazionali.
 
 *L'app NON salva ancora niente, nessun dato*
+
+## Logica di fame e felicità:
+Modifichiamo dinamicamente i valori di fame a seconda dei passi reali contati dal contapassi: 
+vorrei che la fame scendesse di 2 ogni passo, e che la felicità aumenti di 1 ad ogni passo, 
+ma se la fame scende sotto il 50% la felicità scenderà di 1 secondo ogni secondo. 
+Ovviamente il sistema di storing dei passi resta lo stesso.

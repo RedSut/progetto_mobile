@@ -1,5 +1,5 @@
 import 'dart:async';
-
+import 'pet.dart';
 import 'package:flutter/material.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
 import 'package:pedometer/pedometer.dart';                // sensore pedometro reale
@@ -7,15 +7,20 @@ import 'package:permission_handler/permission_handler.dart';
 
 // TODO: da capire come linkare bene con pet, forse basta chiamare i due metodi ogni volta che si aggiornano i passi
 class StepsManager extends ChangeNotifier {
+  Pet pet;
   int _steps = 0;
   int _dailySteps = 0;
   int _weeklySteps = 0;
   int dailyGoal = 2000;
   int weeklyGoal = 10000;
 
-  // 🔄 Costruttore 1 (già presente): chiama _init()
-  StepsManager() {
+  // 🔄 Costruttore 1: richiede l'istanza di Pet e chiama _init()
+  StepsManager(this.pet) {
     _init();                         // Inizializzazione personalizzata
+  }
+
+  void attachPet(Pet p) {
+    pet = p;
   }
 
   int get steps => _steps;
@@ -30,7 +35,7 @@ class StepsManager extends ChangeNotifier {
   int _lastDeviceSteps = 0;           // valore precedente del sensore
 
   // 📌 Costruttore 2 (già presente)
-  StepsManager.second() {
+  StepsManager.second(this.pet) {
     startMidnightTimer();
     loadSteps();
     loadGoals();
@@ -74,6 +79,7 @@ class StepsManager extends ChangeNotifier {
     _steps += steps;
     _dailySteps += steps;
     _weeklySteps += steps;
+    pet.applySteps(steps);
     saveSteps();
     notifyListeners(); // Notifica i widget ascoltatori per aggiornare la UI
   }

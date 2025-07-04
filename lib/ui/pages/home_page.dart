@@ -121,9 +121,10 @@ class _HomePageState extends State<HomePage> {
                   child: CircleAvatar(
                     radius: 80,
                     backgroundColor: Colors.indigo.shade100,
-                    child: Text(
-                      pet.isEgg ? '🥚' : '😺',
-                      style: const TextStyle(fontSize: 64),
+                    child: Image.asset(
+                      pet.isEgg ? 'assets/egg.png' : 'assets/Monster.png',
+                      width: 240,
+                      height: 240,
                     ),
                   ),
                 ),
@@ -162,6 +163,16 @@ class _HomePageState extends State<HomePage> {
             // livello & passi
             Text('Livello ${pet.level}',
                 style: Theme.of(context).textTheme.titleLarge),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 4),
+              child: LinearProgressIndicator(
+                value: pet.xp / Pet.xpPerLevel,
+                minHeight: 8,
+                backgroundColor: Colors.black12,
+                valueColor:
+                const AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
+              ),
+            ),
             const SizedBox(height: 4),
             Text('Passi oggi: ${stepsManager.dailySteps}'),
             const SizedBox(height: 24),

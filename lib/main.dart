@@ -23,7 +23,13 @@ class PetStepsApp extends StatelessWidget {                           // Widget 
     return MultiProvider(                                             // Consente più provider a livello globale
       providers: [                                                    // Elenco dei provider disponibili
         ChangeNotifierProvider(create: (_) => Pet()),                 // Istanza di Pet, osservabile dai widget
-        ChangeNotifierProvider(create: (_) => StepsManager()),        // Istanza di StepsManager, osservabile dai widget
+        ChangeNotifierProxyProvider<Pet, StepsManager>(
+          create: (context) => StepsManager(context.read<Pet>()),
+          update: (_, pet, stepsMgr) {
+            stepsMgr!.pet = pet;
+            return stepsMgr;
+          },
+        ),        // Istanza di StepsManager collegata al Pet
         ChangeNotifierProvider(create: (_) => Bag()),
         ChangeNotifierProvider(create: (_) => ChallengeManager()),
       ],
