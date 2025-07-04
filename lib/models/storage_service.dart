@@ -77,6 +77,16 @@ class StorageService {
     return prefs.getInt('petHappyness') ?? 100;
   }
 
+  static Future<void> savePetXp(int xp) async {
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setInt('petXp', xp);
+  }
+
+  static Future<int> getPetXp() async {
+    final prefs = await _prefs;
+    return prefs.getInt('petXp') ?? 0;
+  }
+
   // 📌 Memorizza se il messaggio di schiusa è già stato mostrato
   static Future<void> saveHatchShown(bool shown) async {
     final prefs = await _prefs;

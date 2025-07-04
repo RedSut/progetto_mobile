@@ -4,12 +4,18 @@ import 'notification_service.dart';
 import 'storage_service.dart';
 
 class Pet extends ChangeNotifier {
+  static const int maxLevel = 100;
+  static const int xpPerLevel = 1000;
+  static const int hungerNotificationThreshold = 30;
+
   int level = 0;
   int hunger = 100;
   int happiness = 100;
   bool isEgg = true;
 
   int _xp = 0;
+  int get xp => _xp;
+
   String imagePath = 'assets/mostro.png';
   DateTime lastUpdated = DateTime.now();
 
@@ -19,6 +25,7 @@ class Pet extends ChangeNotifier {
     hunger = await StorageService.getPetHunger();
     happiness = await StorageService.getPetHappiness();
     lastUpdated = await StorageService.getPetLastUpdated();
+    _xp = await StorageService.getPetXp();
 
     _updateStatsFromTime();  // Appena caricati, aggiorna valori da tempo passato
     notifyListeners();
@@ -30,6 +37,7 @@ class Pet extends ChangeNotifier {
     await StorageService.savePetHunger(hunger);
     await StorageService.savePetHappiness(happiness);
     await StorageService.savePetLastUpdated(lastUpdated);
+    await StorageService.savePetXp(_xp);
   }
 
   void _updateStatsFromTime() {
@@ -37,20 +45,28 @@ class Pet extends ChangeNotifier {
     final elapsedMinutes = now.difference(lastUpdated).inMinutes;
 
     if (elapsedMinutes > 0) {
-      hunger = (hunger - elapsedMinutes).clamp(0, 100);
-      happiness = (happiness - (elapsedMinutes / 2).round()).clamp(0, 100);
+      _decreaseHunger(elapsedMinutes);
+      _decreaseHappiness(elapsedMinutes);
       lastUpdated = now;
       savePet();
       _checkPetStatus();
     }
   }
 
+  void _decreaseHunger(int minutes) {
+    hunger = (hunger - minutes).clamp(0, 100);
+  }
+
+  void _decreaseHappiness(int minutes) {
+    happiness = (happiness - (minutes / 2).round()).clamp(0, 100);
+  }
+
   void updateExp(int amount) {
-    if (level >= 100) return;
+    if (level >= maxLevel) return;
 
     _xp += amount;
-    while (_xp >= 1000 && level < 100) {
-      _xp -= 1000;
+    while (_xp >= xpPerLevel && level < maxLevel) {
+      _xp -= xpPerLevel;
       level++;
     }
     if (level > 0) isEgg = false;
@@ -76,21 +92,29 @@ class Pet extends ChangeNotifier {
   }
 
   Future<void> _checkPetStatus() async {
-    _ensureNotificationPermission().then((granted) {
-      if (granted) {
-        if (hunger < 30) {
-          NotificationService().showNotification(
-              'Il tuo pet ha fame!', 'Vai a dargli da mangiare!'
-          );
-        }
-        if (happiness < 30) {
-          NotificationService().showNotification(
-              'Il tuo pet è triste!', 'Fallo giocare un po\'!'
-          );
-        }
-      } else {
-        debugPrint('Permesso NOTIFICATION negato: le notifiche non verranno mostrate.');
+    final granted = await _ensureNotificationPermission();
+    if (granted) {
+      if (hunger < hungerNotificationThreshold) {
+        NotificationService().showNotification('Il tuo pet ha fame!', 'Vai a dargli da mangiare!');
       }
-    });
+      if (happiness < hungerNotificationThreshold) {
+        NotificationService().showNotification('Il tuo pet è triste!', 'Fallo giocare un po\'!');
+      }
+    } else {
+      debugPrint('Permesso NOTIFICATION negato: le notifiche non verranno mostrate.');
+    }
   }
+
+  Future<void> resetPet() async {
+    level = 0;
+    _xp = 0;
+    hunger = 100;
+    happiness = 100;
+    isEgg = true;
+    imagePath = 'assets/mostro.png';
+    lastUpdated = DateTime.now();
+    await savePet();
+    notifyListeners();
+  }
+
 }
