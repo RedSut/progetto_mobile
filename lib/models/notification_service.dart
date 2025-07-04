@@ -1,5 +1,4 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 
 class NotificationService {
   static final _notifications = FlutterLocalNotificationsPlugin();

@@ -34,6 +34,8 @@ class _HomePageState extends State<HomePage> {
     final stepsManager = Provider.of<StepsManager>(context, listen: false);
     stepsManager.loadSteps();
     stepsManager.loadGoals();
+    // Avvia il servizio per i passi in background all’avvio della HomePage
+    stepsManager.startBackgroundServiceSteps();
     final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
     challengeManager.loadClaimedStatuses();
     //challengeManager.resetClaimedChallenges(); // Serve per resettare lo stato di tutte le challenge

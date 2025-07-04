@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:isolate';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
 import 'package:pedometer/pedometer.dart';                // sensore pedometro reale
-import 'package:permission_handler/permission_handler.dart'; // PATCH: gestione permessi
+import 'package:permission_handler/permission_handler.dart';
+
+import '../main.dart'; // PATCH: gestione permessi
 
 // TODO: da capire come linkare bene con pet, forse basta chiamare i due metodi ogni volta che si aggiornano i passi
 class StepsManager extends ChangeNotifier {
@@ -12,6 +16,7 @@ class StepsManager extends ChangeNotifier {
   int _weeklySteps = 0;
   int dailyGoal = 2000;
   int weeklyGoal = 10000;
+  ReceivePort? _receivePort; // per i passi in background
 
   // 🔄 Costruttore 1 (già presente): chiama _init()
   StepsManager() {
@@ -138,6 +143,46 @@ class StepsManager extends ChangeNotifier {
     _midnightTimer?.cancel();
     _stopListening();
     super.dispose();
+  }
+
+  // ---------------------------------------------------------------------------
+  //  Metodi per la gestione dei passi in background
+  // ---------------------------------------------------------------------------
+  Future<void> startBackgroundServiceSteps() async {
+    await _requestPermissionsBackground();
+    await startForegroundService();
+  }
+
+  Future<void> _requestPermissionsBackground() async {
+    var status = await Permission.activityRecognition.status;
+    if (!status.isGranted) {
+      await Permission.activityRecognition.request();
+    }
+  }
+
+  Future<void> startForegroundService() async {
+    if (await FlutterForegroundTask.isRunningService) return;
+
+    bool started = await FlutterForegroundTask.startService(
+      notificationTitle: 'PetSteps attivo',
+      notificationText: 'Sto contando i tuoi passi!',
+      callback: startCallback,
+    );
+
+    if (started) {
+      _receivePort = FlutterForegroundTask.receivePort;
+      _receivePort?.listen((data) {
+        _steps = data as int;
+        notifyListeners();
+      });
+    }
+  }
+
+
+  Future<void> stopForegroundService() async {
+    if (await FlutterForegroundTask.isRunningService) {
+      await FlutterForegroundTask.stopService();
+    }
   }
 
   // ---------------------------------------------------------------------------
