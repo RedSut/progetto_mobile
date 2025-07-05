@@ -213,27 +213,51 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
 
-      // ───────────── Pulsante debug +500 passi ─────────────
+      // ───────────── Pulsanti debug ─────────────
       floatingActionButton: kDebugMode
-          ? FloatingActionButton.small(
-        heroTag: 'debugWalk',
-        tooltip: '+500 passi',
-        child: const Icon(Icons.directions_walk),
-        onPressed: () {
-          final stepsMgr = context.read<StepsManager>();
-          final petRef   = context.read<Pet>();
+      ? Column(
+      mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          FloatingActionButton.small(
+            heroTag: 'debugWalk',
+            tooltip: '+500 passi',
+            child: const Icon(Icons.directions_walk),
+            onPressed: () {
+              final stepsMgr = context.read<StepsManager>();
+              final petRef   = context.read<Pet>();
 
-          stepsMgr.addSteps(500);         // passi ↑
-          petRef.updateExp(500);          // XP / livello
+              stepsMgr.addSteps(500);
+              petRef.updateExp(500);
+              petRef
+              ..hunger = (petRef.hunger - 5).clamp(0, 100)
+              ..happiness = (petRef.happiness + 5).clamp(0, 100)
+              ..notifyListeners();
+            },
+          ),
+          const SizedBox(height: 12),
+          FloatingActionButton.small(
+            heroTag: 'debugReset',
+            tooltip: 'Reset app',
+            backgroundColor: Colors.redAccent,
+            child: const Icon(Icons.restart_alt),
+            onPressed: () async {
+              resetApp(context);
 
-          // fame ↓ 5, felicità ↑ 5
-          petRef
-            ..hunger     = (petRef.hunger - 5).clamp(0, 100)
-            ..happiness  = (petRef.happiness + 5).clamp(0, 100)
-            ..notifyListeners();
-        },
-      )
-          : null,
+              setState(() {
+                _previousLevel = -1;
+                _hatchDialogShown = false;
+              });
+
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Dati resettati')),
+                );
+              }
+            },
+          ),
+        ],
+      ): null,
     );
   }
 }
@@ -332,4 +356,17 @@ class _AppDrawer extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<void> resetApp(BuildContext context) async {
+  final stepsMgr = context.read<StepsManager>();
+  final petRef   = context.read<Pet>();
+  final challengeMgr   = context.read<ChallengeManager>();
+  final bagMgr   = context.read<Bag>();
+
+  await StorageService.clearAll();
+  await stepsMgr.resetStepsAndGoals();
+  await petRef.resetPet();
+  await challengeMgr.resetClaimedChallenges();
+  await bagMgr.resetBag();
 }

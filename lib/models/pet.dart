@@ -48,12 +48,14 @@ class Pet extends ChangeNotifier {
     final elapsedMinutes = now.difference(lastUpdated).inMinutes;
 
     if (elapsedMinutes > 0) {
-      _decreaseHunger(elapsedMinutes);
-      _decreaseHappiness(elapsedMinutes);
+      if (!isEgg) {
+        _decreaseHunger(elapsedMinutes);
+        _decreaseHappiness(elapsedMinutes);
+        _checkPetStatus();
+        _updateHappinessTimer();
+      }
       lastUpdated = now;
       savePet();
-      _checkPetStatus();
-      _updateHappinessTimer();
     }
   }
 

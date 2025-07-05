@@ -47,4 +47,10 @@ class Bag extends ChangeNotifier {
   Future<void> saveBag() async {
     StorageService.saveBag(items);
   }
+
+  // Reset bag
+  Future<void> resetBag() async {
+    items = {};
+    await saveBag();
+  }
 }

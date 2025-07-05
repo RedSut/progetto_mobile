@@ -138,6 +138,19 @@ class StepsManager extends ChangeNotifier {
     _lastDeviceSteps = 0;
   }
 
+  // Funzione per resettare i passi
+  Future<void> resetStepsAndGoals() async {
+    _steps = 0;
+    _dailySteps = 0;
+    _weeklySteps = 0;
+    dailyGoal = 2000;
+    weeklyGoal = 10000;
+    await StorageService.saveDailyGoal(dailyGoal);
+    await StorageService.saveWeeklyGoal(weeklyGoal);
+    await saveSteps();
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     // Per evitare memory leak quando il provider viene distrutto

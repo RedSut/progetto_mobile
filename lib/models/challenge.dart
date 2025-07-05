@@ -110,10 +110,11 @@ class ChallengeManager extends ChangeNotifier{
     notifyListeners();
   }
 
-  void resetClaimedChallenges(){
+  Future<void> resetClaimedChallenges() async {
     for (var challenge in challenges){
       challenge.isClaimed = false;
     }
+    await StorageService.saveClaimedChallenges([]);
     notifyListeners();
   }
 }
