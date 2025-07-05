@@ -30,6 +30,12 @@ class Pet extends ChangeNotifier {
     lastUpdated = await StorageService.getPetLastUpdated();
     _xp = await StorageService.getPetXp();
 
+    if (isEgg){
+      imagePath = 'assets/egg.png';
+    }else{
+      imagePath = 'assets/Monster.png';
+    }
+
     _updateStatsFromTime();  // Appena caricati, aggiorna valori da tempo passato
     notifyListeners();
   }
