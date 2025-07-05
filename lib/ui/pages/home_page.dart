@@ -229,10 +229,6 @@ class _HomePageState extends State<HomePage> {
 
               stepsMgr.addSteps(500);
               petRef.updateExp(500);
-              petRef
-              ..hunger = (petRef.hunger - 5).clamp(0, 100)
-              ..happiness = (petRef.happiness + 5).clamp(0, 100)
-              ..notifyListeners();
             },
           ),
           const SizedBox(height: 12),

@@ -84,9 +84,11 @@ class Pet extends ChangeNotifier {
   }
 
   void applySteps(int steps) {
-    hunger = (hunger - (steps * 2)).clamp(0, 100);
-    happiness = (happiness + steps).clamp(0, 100);
-    _updateHappinessTimer();
+    if (!isEgg){
+      hunger = (hunger - (steps * 2)).clamp(0, 100);
+      happiness = (happiness + steps).clamp(0, 100);
+      _updateHappinessTimer();
+    }
     lastUpdated = DateTime.now();
     savePet();
     notifyListeners();
