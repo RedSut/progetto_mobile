@@ -68,6 +68,10 @@ class _HomePageState extends State<HomePage> {
     final pet          = context.watch<Pet>();
     final stepsManager = context.watch<StepsManager>();
 
+    // Calcolo dell'orario per l'immagine di sfondo, se tra le 6 e le 18 → giorno, altrimenti notte
+    final hour = DateTime.now().hour;
+    final isDayTime = hour >= 6 && hour < 18;
+
     // ─── Messaggio quando il pet passa da livello 0 a 1 ───
       if (!_hatchDialogShown &&
           _previousLevel != -1 &&
@@ -102,115 +106,148 @@ class _HomePageState extends State<HomePage> {
     _previousLevel = pet.level;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Pet Steps')),
+      appBar: AppBar(
+        title: const Text('Pet Steps'),
+        backgroundColor: Colors.orange.shade200,),
       drawer: const _AppDrawer(),
 
       // ─────────────── Corpo ───────────────
-      body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // avatar + overlay
-            Stack(
-              alignment: Alignment.center,
-              clipBehavior: Clip.none,
+      body: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            isDayTime
+                ? 'assets/imagePratoDay.png'
+                : 'assets/imagePratoNight.png',
+          fit: BoxFit.cover,
+          ),
+          Container(
+            color: Colors.black.withOpacity(0.2),
+          ),
+          Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                GestureDetector(
-                  onLongPressStart: (_) => setState(() => _showStats = true),
-                  onLongPressEnd:   (_) => setState(() => _showStats = false),
-                  child: CircleAvatar(
-                    radius: 80,
-                    backgroundColor: Colors.indigo.shade100,
-                    child: Image.asset(
-                      pet.isEgg ? 'assets/egg.png' : 'assets/Monster.png',
-                      width: 240,
-                      height: 240,
-                    ),
-                  ),
-                ),
-                if (_showStats)
-                  Positioned(
-                    top: -110,
-                    child: Material(
-                      color: Colors.black.withOpacity(0.75),
-                      borderRadius: BorderRadius.circular(12),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            _StatBar(
-                              label: 'Fame',
-                              value: pet.hunger,
-                              icon: Icons.restaurant,
-                            ),
-                            const SizedBox(height: 8),
-                            _StatBar(
-                              label: 'Felicità',
-                              value: pet.happiness,
-                              icon: Icons.emoji_emotions,
-                            ),
-                          ],
+                // avatar + overlay
+                Stack(
+                  alignment: Alignment.center,
+                  clipBehavior: Clip.none,
+                  children: [
+                    GestureDetector(
+                      onLongPressStart: (_) => setState(() => _showStats = true),
+                      onLongPressEnd:   (_) => setState(() => _showStats = false),
+                      child: CircleAvatar(
+                        radius: 80,
+                        backgroundColor: Colors.orange.shade200,
+                        child: Image.asset(
+                          //pet.isEgg ? 'assets/egg.png' : 'assets/Monster.png',
+                          pet.imagePath,
+                          width: 240,
+                          height: 240,
                         ),
                       ),
                     ),
+                    if (_showStats)
+                      Positioned(
+                        top: -110,
+                        child: Material(
+                          color: Colors.black.withOpacity(0.75),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _StatBar(
+                                  label: 'Fame',
+                                  value: pet.hunger,
+                                  icon: Icons.restaurant,
+                                ),
+                                const SizedBox(height: 8),
+                                _StatBar(
+                                  label: 'Felicità',
+                                  value: pet.happiness,
+                                  icon: Icons.emoji_emotions,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+
+                // livello & passi
+                Text('Livello ${pet.level}',
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      color: isDayTime
+                          ? Colors.black
+                          : Colors.white,
+                    )
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 4),
+                  child: LinearProgressIndicator(
+                    value: pet.xp / Pet.xpPerLevel,
+                    minHeight: 8,
+                    backgroundColor: isDayTime ? Colors.black12 : Colors.white12,
+                    valueColor:
+                    const AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
                   ),
+                ),
+                const SizedBox(height: 4),
+                Text('Passi oggi: ${stepsManager.dailySteps}',
+                    style: TextStyle(
+                      color: isDayTime
+                          ? Colors.black
+                          : Colors.white,
+                    )
+                ),
+                const SizedBox(height: 24),
+
+                // pulsanti feed / rewards
+                FilledButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const FeedPage()),
+                    );
+                  },
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(150, 44),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.black,
+                  ),
+                  child: const Text('Feed him'),
+                ),
+                const SizedBox(height: 12),
+                OutlinedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RewardsPage()),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(150, 44),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                    backgroundColor: Colors.orange.shade100,
+                    foregroundColor: Colors.orange,
+                    side: const BorderSide(color: Colors.orange),
+                  ),
+                  child: const Text('Claim rewards'),
+                ),
               ],
             ),
-            const SizedBox(height: 24),
-
-            // livello & passi
-            Text('Livello ${pet.level}',
-                style: Theme.of(context).textTheme.titleLarge),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 4),
-              child: LinearProgressIndicator(
-                value: pet.xp / Pet.xpPerLevel,
-                minHeight: 8,
-                backgroundColor: Colors.black12,
-                valueColor:
-                const AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text('Passi oggi: ${stepsManager.dailySteps}'),
-            const SizedBox(height: 24),
-
-            // pulsanti feed / rewards
-            FilledButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const FeedPage()),
-                );
-              },
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(150, 44),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22),
-                ),
-              ),
-              child: const Text('Feed him'),
-            ),
-            const SizedBox(height: 12),
-            OutlinedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const RewardsPage()),
-                );
-              },
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(150, 44),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(22),
-                ),
-              ),
-              child: const Text('Claim rewards'),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
 
       // ───────────── Pulsanti debug ─────────────
@@ -309,6 +346,7 @@ class _AppDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Drawer(
+      backgroundColor: Colors.orange.shade200,
       child: ListView(
         children: [
           const DrawerHeader(
@@ -322,6 +360,7 @@ class _AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.backpack),
+            iconColor: Colors.black,
             title: const Text('Bag'),
             onTap: () {
               Navigator.push(
@@ -331,6 +370,7 @@ class _AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.bar_chart),
+            iconColor: Colors.black,
             title: const Text('Stats'),
             onTap: () {
               Navigator.push(
@@ -340,6 +380,7 @@ class _AppDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.settings),
+            iconColor: Colors.black,
             title: const Text('Settings'),
             onTap: () {
               Navigator.push(
