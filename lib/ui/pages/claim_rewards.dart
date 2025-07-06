@@ -246,17 +246,14 @@ class _RewardsPageState extends State<RewardsPage> {
                         _claimingChallenges.remove(i);
                       });
 
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Ricompensa riscattata!'),
-                          content: Text('Hai ricevuto ${challenge.reward.quantity}x ${challenge.reward.item.name}!'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('OK'),
-                            ),
-                          ],
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Hai ricevuto ${challenge.reward.quantity}x ${challenge.reward.item.name}!',
+                          ),
+                          behavior: SnackBarBehavior.floating,
+                          backgroundColor: Colors.green.shade600,
+                          duration: const Duration(seconds: 3),
                         ),
                       );
                     },

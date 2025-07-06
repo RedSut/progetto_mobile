@@ -110,144 +110,182 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Pet Steps'),
         backgroundColor: Colors.orange.shade200,),
       drawer: const _AppDrawer(),
+      drawerEdgeDragWidth: 30.0,
 
       // ─────────────── Corpo ───────────────
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(
-            isDayTime
-                ? 'assets/imagePratoDay.png'
-                : 'assets/imagePratoNight.png',
-          fit: BoxFit.cover,
-          ),
-          Container(
-            color: Colors.black.withOpacity(0.2),
-          ),
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // avatar + overlay
-                Stack(
-                  alignment: Alignment.center,
-                  clipBehavior: Clip.none,
-                  children: [
-                    GestureDetector(
-                      onLongPressStart: (_) => setState(() => _showStats = true),
-                      onLongPressEnd:   (_) => setState(() => _showStats = false),
-                      child: CircleAvatar(
-                        radius: 80,
-                        backgroundColor: Colors.orange.shade200,
-                        child: Image.asset(
-                          //pet.isEgg ? 'assets/egg.png' : 'assets/Monster.png',
-                          pet.imagePath,
-                          width: 240,
-                          height: 240,
-                        ),
-                      ),
-                    ),
-                    if (_showStats)
-                      Positioned(
-                        top: -110,
-                        child: Material(
-                          color: Colors.black.withOpacity(0.75),
-                          borderRadius: BorderRadius.circular(12),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _StatBar(
-                                  label: 'Fame',
-                                  value: pet.hunger,
-                                  icon: Icons.restaurant,
-                                ),
-                                const SizedBox(height: 8),
-                                _StatBar(
-                                  label: 'Felicità',
-                                  value: pet.happiness,
-                                  icon: Icons.emoji_emotions,
-                                ),
-                              ],
-                            ),
+      body: GestureDetector(
+        onVerticalDragEnd: (details) {
+          if (details.primaryVelocity! < -300) {
+            showModalBottomSheet(
+              context: context,
+              isScrollControlled: true,   // per farla full screen
+              enableDrag: true,           // abilita lo swipe per chiudere
+              backgroundColor: Colors.transparent, // opzionale: se vuoi sfondo trasparente
+              builder: (context) => const BagPage(),
+            );
+          }
+        },
+        onHorizontalDragEnd: (details) {
+          if (details.primaryVelocity != null && details.primaryVelocity! < 0) {
+            // swipe da destra verso sinistra
+            Navigator.push(
+              context,
+              PageRouteBuilder(
+                pageBuilder: (context, animation, secondaryAnimation) => StatsPage(),
+                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                  const begin = Offset(1.0, 0.0);  // parte da destra
+                  const end = Offset.zero;
+                  const curve = Curves.ease;
+
+                  final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                  final offsetAnimation = animation.drive(tween);
+
+                  return SlideTransition(
+                    position: offsetAnimation,
+                    child: child,
+                  );
+                },
+              ),
+            );
+          }
+        },
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(
+              isDayTime
+                  ? 'assets/imagePratoDay.png'
+                  : 'assets/imagePratoNight.png',
+            fit: BoxFit.cover,
+            ),
+            Container(
+              color: Colors.black.withOpacity(0.2),
+            ),
+            Center(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // avatar + overlay
+                  Stack(
+                    alignment: Alignment.center,
+                    clipBehavior: Clip.none,
+                    children: [
+                      GestureDetector(
+                        onLongPressStart: (_) => setState(() => _showStats = true),
+                        onLongPressEnd:   (_) => setState(() => _showStats = false),
+                        child: CircleAvatar(
+                          radius: 80,
+                          backgroundColor: Colors.orange.shade200,
+                          child: Image.asset(
+                            //pet.isEgg ? 'assets/egg.png' : 'assets/Monster.png',
+                            pet.imagePath,
+                            width: 240,
+                            height: 240,
                           ),
                         ),
                       ),
-                  ],
-                ),
-                const SizedBox(height: 24),
+                      if (_showStats)
+                        Positioned(
+                          top: -110,
+                          child: Material(
+                            color: Colors.black.withOpacity(0.75),
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 12),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  _StatBar(
+                                    label: 'Fame',
+                                    value: pet.hunger,
+                                    icon: Icons.restaurant,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  _StatBar(
+                                    label: 'Felicità',
+                                    value: pet.happiness,
+                                    icon: Icons.emoji_emotions,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
 
-                // livello & passi
-                Text('Livello ${pet.level}',
-                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                      color: isDayTime
-                          ? Colors.black
-                          : Colors.white,
-                    )
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 4),
-                  child: LinearProgressIndicator(
-                    value: pet.xp / Pet.xpPerLevel,
-                    minHeight: 8,
-                    backgroundColor: isDayTime ? Colors.black12 : Colors.white12,
-                    valueColor:
-                    const AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
+                  // livello & passi
+                  Text('Livello ${pet.level}',
+                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                        color: isDayTime
+                            ? Colors.black
+                            : Colors.white,
+                      )
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text('Passi oggi: ${stepsManager.dailySteps}',
-                    style: TextStyle(
-                      color: isDayTime
-                          ? Colors.black
-                          : Colors.white,
-                    )
-                ),
-                const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 4),
+                    child: LinearProgressIndicator(
+                      value: pet.xp / Pet.xpPerLevel,
+                      minHeight: 8,
+                      backgroundColor: isDayTime ? Colors.black12 : Colors.white12,
+                      valueColor:
+                      const AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text('Passi oggi: ${stepsManager.dailySteps}',
+                      style: TextStyle(
+                        color: isDayTime
+                            ? Colors.black
+                            : Colors.white,
+                      )
+                  ),
+                  const SizedBox(height: 24),
 
-                // pulsanti feed / rewards
-                FilledButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const FeedPage()),
-                    );
-                  },
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size(150, 44),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22),
+                  // pulsanti feed / rewards
+                  FilledButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const FeedPage()),
+                      );
+                    },
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size(150, 44),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.black,
                     ),
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.black,
+                    child: const Text('Feed him'),
                   ),
-                  child: const Text('Feed him'),
-                ),
-                const SizedBox(height: 12),
-                OutlinedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (_) => const RewardsPage()),
-                    );
-                  },
-                  style: OutlinedButton.styleFrom(
-                    minimumSize: const Size(150, 44),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22),
+                  const SizedBox(height: 12),
+                  OutlinedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RewardsPage()),
+                      );
+                    },
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(150, 44),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22),
+                      ),
+                      backgroundColor: Colors.orange.shade100,
+                      foregroundColor: Colors.orange,
+                      side: const BorderSide(color: Colors.orange),
                     ),
-                    backgroundColor: Colors.orange.shade100,
-                    foregroundColor: Colors.orange,
-                    side: const BorderSide(color: Colors.orange),
+                    child: const Text('Claim rewards'),
                   ),
-                  child: const Text('Claim rewards'),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
 
       // ───────────── Pulsanti debug ─────────────
