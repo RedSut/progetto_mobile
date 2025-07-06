@@ -75,102 +75,139 @@ class _FeedPageState extends State<FeedPage> {
     final pet = context.watch<Pet>();
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Feed')),
-      body: Column(
+      appBar: AppBar(title: const Text('Feed'),
+        backgroundColor: Colors.blue.shade200,),
+      body: Stack(
+        fit: StackFit.expand,
         children: [
-          const SizedBox(height: 24),
-          Text('Fame: ${pet.hunger}/100',
-              style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 16),
-          LinearProgressIndicator(
-            value: pet.hunger / 100,
-            minHeight: 10,
+          Image.asset(
+            'assets/imagePratoDay.png',
+            fit: BoxFit.cover,
           ),
-          const SizedBox(height: 24),
+          Container(
+            color: Colors.black.withOpacity(0.2),
+          ),
           Column(
             children: [
-              Image.asset(
-                pet.isEgg ? 'assets/egg.png' : 'assets/Monster.png',
-                width: 240,
-                height: 240,
+              const SizedBox(height: 24),
+              Text('Fame: ${pet.hunger}/100',
+                  style: Theme.of(context).textTheme.titleMedium),
+              const SizedBox(height: 16),
+              LinearProgressIndicator(
+                value: pet.hunger / 100,
+                minHeight: 10,
+                color: Colors.orange,
               ),
-              const SizedBox(height: 8),
-              Text(
-                _currentPhrase,
-                textAlign: TextAlign.center,
-                style: const TextStyle(fontStyle: FontStyle.italic),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Expanded(
-            child: Consumer<Bag>(
-              builder: (context, bag, _) {
-                final entries = bag.items.entries.toList();
-                return GridView.builder(
-                  padding: const EdgeInsets.all(16),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
+              const SizedBox(height: 24),
+              Column(
+                children: [
+                  Image.asset(
+                    pet.isEgg ? 'assets/egg.png' : 'assets/Monster.png',
+                    width: 240,
+                    height: 240,
                   ),
-                  itemCount: entries.length,
-                  itemBuilder: (context, index) {
-                    final entry = entries[index];
-                    final food = entry.key;
-                    final quantity = entry.value;
-                    return GestureDetector(
-                      onTap: () {
-                        final bag = context.read<Bag>();
-                        if (bag.removeItem(food, 1)) {
-                          final value =
-                              FeedPage.feedValues[food.name] ?? food.feedValue;
-                          context.read<Pet>().feed(value);
-                          _changePhrase();
-                          setState(() {}); // aggiorna la barra della fame
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${food.name} dato al pet!'),
-                              duration: const Duration(seconds: 1),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      _currentPhrase,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontStyle: FontStyle.italic),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Expanded(
+                child : Container(
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade200,
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24),
+                    ),
+                  ),
+                  child: Consumer<Bag>(
+                    builder: (context, bag, _) {
+                      final entries = bag.items.entries.toList();
+                      return GridView.builder(
+                        padding: const EdgeInsets.all(16),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 3,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                        ),
+                        itemCount: entries.length,
+                        itemBuilder: (context, index) {
+                          final entry = entries[index];
+                          final food = entry.key;
+                          final quantity = entry.value;
+                          return GestureDetector(
+                            onTap: () {
+                              final bag = context.read<Bag>();
+                              if (bag.removeItem(food, 1)) {
+                                final value =
+                                    FeedPage.feedValues[food.name] ?? food.feedValue;
+                                context.read<Pet>().feed(value);
+                                _changePhrase();
+                                setState(() {}); // aggiorna la barra della fame
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text('${food.name} dato al pet!'),
+                                    duration: const Duration(seconds: 1),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Stack(
+                                  alignment: Alignment.topRight,
+                                  children: [
+                                    Image.asset(food.imagePath, width: 64, height: 64),
+                                    Container(
+                                      padding: const EdgeInsets.all(2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.black54,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Text(
+                                        'x$quantity',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  food.name,
+                                  style: const TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                           );
-                        }
-                      },
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Stack(
-                            alignment: Alignment.topRight,
-                            children: [
-                              Image.asset(food.imagePath, width: 64, height: 64),
-                              Container(
-                                padding: const EdgeInsets.all(2),
-                                decoration: BoxDecoration(
-                                  color: Colors.black54,
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  'x$quantity',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            food.name,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
