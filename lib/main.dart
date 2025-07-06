@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';                               // Widget e tema Material
+import 'package:flutter/services.dart';
 import 'package:progetto_mobile/models/challenge.dart';
 import 'package:provider/provider.dart';                              // Provider per dependency injection e stato
 
@@ -11,6 +12,10 @@ import 'ui/pages/home_page.dart';                                     // Pagina 
 void main() async {                                                   // Entry point dell’app
 
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([ // Lancia l'app in modalità solo portrait
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
   await NotificationService().init();
   runApp(const PetStepsApp());                                        // Avvia il widget radice PetStepsApp
 }

@@ -92,21 +92,29 @@ class _StatsPageState extends State<StatsPage> {
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
       ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(vertical: 30),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildStatItem("Daily steps", stepsManager.dailySteps,
-                  goal: stepsManager.dailyGoal),
-              const SizedBox(height: 40),
-              _buildStatItem("Weekly steps", stepsManager.weeklySteps,
-                  goal: stepsManager.weeklyGoal),
-              const SizedBox(height: 40),
-              _buildStatItem("Lifetime steps", stepsManager.steps,
-                  showArc: false),
-            ],
+      body: GestureDetector(
+        onHorizontalDragUpdate: (details) {
+        // Se lo swipe va verso destra con una velocità o distanza minima
+          if (details.delta.dx > 10) {  // valore da aggiustare per sensibilità
+            Navigator.of(context).pop();
+          }
+        },
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(vertical: 30),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _buildStatItem("Daily steps", stepsManager.dailySteps,
+                    goal: stepsManager.dailyGoal),
+                const SizedBox(height: 40),
+                _buildStatItem("Weekly steps", stepsManager.weeklySteps,
+                    goal: stepsManager.weeklyGoal),
+                const SizedBox(height: 40),
+                _buildStatItem("Lifetime steps", stepsManager.steps,
+                    showArc: false),
+              ],
+            ),
           ),
         ),
       ),
