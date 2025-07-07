@@ -5,6 +5,7 @@ import 'package:progetto_mobile/models/challenge.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
 import 'package:progetto_mobile/ui/pages/settings_page.dart';
 import 'package:provider/provider.dart';
+import 'dart:math';
 
 import '../../models/bag.dart';
 import '../../models/pet.dart';
@@ -26,10 +27,50 @@ class _HomePageState extends State<HomePage> {
   Timer? _mockStepTimer;
   int _previousLevel = -1;                          // livello precedente; -1 se non caricato
   bool _hatchDialogShown = false;
+  late final Pet _pet;
+
+  static const List<String> happyNotHungryPhrases = [
+    'Oggi mi sento alla grande!',
+    'Che bella giornata!',
+    'Sono pronto per nuove avventure!',
+    'Mi sento sazio e felice!',
+    'Grazie per prenderti cura di me!'
+  ];
+
+  static const List<String> happyHungryPhrases = [
+    'Sto iniziando ad avere fame...',
+    'Un piccolo spuntino sarebbe perfetto!',
+    'Potrei sgranocchiare qualcosa.',
+    'Che profumino! Hai qualcosa da mangiare?',
+    'Ho un languorino...'
+  ];
+
+  static const List<String> sadNotHungryPhrases = [
+    'Non mi sento molto allegro...',
+    "Mi annoio un po'.",
+    "Avrei bisogno di un po' di compagnia.",
+    'Sigh... che giornata triste.',
+    'Potresti giocare con me?'
+  ];
+
+  static const List<String> sadHungryPhrases = [
+    'Ho fame e mi sento giù...',
+    'Mi brontola lo stomaco e sono triste.',
+    'Per favore, dammi qualcosa da mangiare...',
+    'Sono affamato e infelice.',
+    'Niente cibo e niente felicità...'
+  ];
+
+  String _currentPhrase = '';
+  Timer? _phraseTimer;
+  static const String eggPhrase =
+      "Wonder what's inside? It needs more time, and more steps!";
 
   @override
   void initState() {
     super.initState();
+    _pet = Provider.of<Pet>(context, listen: false);
+    _pet.addListener(_handlePetChange);
     _initAsync();
   }
 
@@ -44,22 +85,75 @@ class _HomePageState extends State<HomePage> {
     final bag = Provider.of<Bag>(context, listen: false);
     await bag.loadBag();
 
-    final pet = Provider.of<Pet>(context, listen: false);
-    await pet.loadPet();
+    await _pet.loadPet();
     setState(() {
-      _previousLevel = pet.level;
+      _previousLevel = _pet.level;
     });
 
     final hatchShown = await StorageService.getHatchShown();
     setState(() {
       _hatchDialogShown = hatchShown;
     });
+
+    _updatePhrase();
   }
 
+  void _handlePetChange() {
+    if (!mounted) return;
+    _updatePhrase();
+  }
+
+  void _updatePhrase() {
+    if (_pet.isEgg) {
+      _phraseTimer?.cancel();
+      if (_currentPhrase != eggPhrase) {
+        setState(() {
+          _currentPhrase = eggPhrase;
+        });
+      }
+    } else {
+      // Start phrase rotation only if not already active to avoid
+      // restarting it whenever the pet's stats update.
+      if (_phraseTimer == null) {
+        _changePhrase();
+      }
+    }
+  }
+
+  void _changePhrase() {
+    final pet = context.read<Pet>();
+    if (pet.isEgg) {
+      _phraseTimer?.cancel();
+      return;
+    }
+
+    final random = Random();
+    final isHungry = pet.hunger < 50;
+    final isHappy = pet.happiness >= 50;
+
+    List<String> phrases;
+    if (isHappy && !isHungry) {
+      phrases = happyNotHungryPhrases;
+    } else if (isHappy && isHungry) {
+      phrases = happyHungryPhrases;
+    } else if (!isHappy && !isHungry) {
+      phrases = sadNotHungryPhrases;
+    } else {
+      phrases = sadHungryPhrases;
+    }
+
+    _currentPhrase = phrases[random.nextInt(phrases.length)];
+    setState(() {});
+
+    _phraseTimer?.cancel();
+    _phraseTimer = Timer(const Duration(seconds: 30), _changePhrase);
+  }
 
   @override
   void dispose() {
     _mockStepTimer?.cancel();
+    _phraseTimer?.cancel();
+    _pet.removeListener(_handlePetChange);
     super.dispose();
   }
 
@@ -196,8 +290,8 @@ class _HomePageState extends State<HomePage> {
                           top: -110,
                           child: Material(
                             color: Colors.black.withOpacity(0.75),
-                            borderRadius: BorderRadius.circular(12),
-                            child: Padding(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 16, vertical: 12),
                               child: Column(
@@ -220,6 +314,26 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                     ],
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(2, 2),
+                        ),
+                      ],
+                    ),
+                    child: Text(
+                      _currentPhrase,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontStyle: FontStyle.italic),
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -249,7 +363,6 @@ class _HomePageState extends State<HomePage> {
                             : Colors.white,
                       )
                   ),
-                  const SizedBox(height: 24),
 
                   // pulsanti feed / rewards
                   FilledButton(
