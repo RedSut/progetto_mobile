@@ -93,9 +93,9 @@ class _StatsPageState extends State<StatsPage> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: GestureDetector(
+        behavior: HitTestBehavior.opaque, // importantissimo
         onHorizontalDragUpdate: (details) {
-        // Se lo swipe va verso destra con una velocità o distanza minima
-          if (details.delta.dx > 10) {  // valore da aggiustare per sensibilità
+          if (details.delta.dx > 10) {
             Navigator.of(context).pop();
           }
         },

@@ -75,9 +75,6 @@ flutter:
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package
   assets:
-    - assets/peach.png
-    - assets/carrot.png
-    - assets/strawberry.png
     - assets/Monster.png
     - assets/egg.png
     - assets/itemLeppa.png

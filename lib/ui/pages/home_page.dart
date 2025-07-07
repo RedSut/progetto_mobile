@@ -121,7 +121,14 @@ class _HomePageState extends State<HomePage> {
               isScrollControlled: true,   // per farla full screen
               enableDrag: true,           // abilita lo swipe per chiudere
               backgroundColor: Colors.transparent, // opzionale: se vuoi sfondo trasparente
-              builder: (context) => const BagPage(),
+              builder: (context) => Container(
+                height: MediaQuery.of(context).size.height * 0.95,  // 95% altezza schermo
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: const BagPage(),
+              ),
             );
           }
         },
