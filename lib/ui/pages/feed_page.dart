@@ -147,7 +147,20 @@ class _FeedPageState extends State<FeedPage> {
                   child: Consumer<Bag>(
                     builder: (context, bag, _) {
                       final entries = bag.items.entries.toList();
-                      return GridView.builder(
+                      return bag.items.isEmpty
+                        ? const Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text('La tua borsa è vuota!',
+                                style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
+                              SizedBox(height: 16),
+                              Text('Prova a completare quanche challenge o ritirare le ricompense di quelle già completate',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.black, fontSize: 20, fontStyle: FontStyle.italic)),
+                            ]
+                          ),
+                        ) : GridView.builder(
                         padding: const EdgeInsets.all(16),
                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 3,

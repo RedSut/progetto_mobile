@@ -37,10 +37,17 @@ class BagPage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: bag.items.isEmpty
                 ? const Center(
-              child: Text(
-                'La tua borsa è vuota!',
-                style: TextStyle(color: Colors.white, fontSize: 20),
-                    ),
+              child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: const [
+                    Text('La tua borsa è vuota!',
+                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
+                    SizedBox(height: 16),
+                    Text('Prova a completare quanche challenge o ritirare le ricompense di quelle già completate',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.white, fontSize: 20, fontStyle: FontStyle.italic)),
+                  ]
+              ),
             )
                 : GridView.count(
               crossAxisCount: 2,
