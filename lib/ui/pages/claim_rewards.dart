@@ -86,9 +86,6 @@ class _RewardsPageState extends State<RewardsPage> {
     if (hourlyRemaining.inSeconds <= 60) {
       removeClaim('hourly');
     }
-    if (minuteRemaining.inSeconds <= 60) {
-      removeClaim('minute');
-    }
   }
 
   // Converte una Duration in stringa tipo "1d23h59m"
@@ -151,45 +148,50 @@ class _RewardsPageState extends State<RewardsPage> {
           ),
           const SizedBox(height: 12),
           // Bottone "Claim Reward"
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: progress >= 1.0
-                  ? Colors.orange  // Colore normale se attivo
-                  : Colors.orange.withAlpha((255 * 0.3).round()), // Colore più trasparente se disabilitato
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(30), // Angoli arrotondati
+          AnimatedScale(
+            scale: isClaiming ? 1.1 : 1.0,
+            duration: const Duration(milliseconds: 300),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: progress >= 1.0
+                    ? Colors.orange  // Colore normale se attivo
+                    : Colors.orange.withAlpha((255 * 0.3).round()), // Colore più trasparente se disabilitato
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(30), // Angoli arrotondati
+                ),
               ),
-            ),
-            onPressed: (progress >= 1.0 && !isClaimed && !isClaiming)
-                ? onClaimPressed
-                : null,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center, // Centra il contenuto
-              children: [
-                Text(
-                  challenge.isClaimed ? 'CLAIMED' : 'CLAIM REWARD',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 10),
-                // Quantità della ricompensa (es: "5x")
-                Text(
-                  '${challenge.reward.quantity}x',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(width: 5),
-                // Icona della ricompensa
-                Image.asset(
-                  challenge.reward.item.imagePath,
-                  width: 24,
-                  height: 24,
-                ),
-              ],
+              onPressed: (progress >= 1.0 && !isClaimed && !isClaiming)
+                  ? onClaimPressed
+                  : null,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center, // Centra il contenuto
+                children: [
+                  Text(
+                    challenge.isClaimed ? 'CLAIMED' : 'CLAIM REWARD',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 10),
+                  // Quantità della ricompensa (es: "5x")
+                  Text(
+                    '${challenge.reward.quantity}x',
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(width: 5),
+                  // Icona della ricompensa
+                  Image.asset(
+                    challenge.reward.item.imagePath,
+                    width: 24,
+                    height: 24,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
       ),
     );
   }
+
 
   // Metodo chiamato quando la schermata viene chiusa
   @override
@@ -227,6 +229,9 @@ class _RewardsPageState extends State<RewardsPage> {
               for (int i = 0; i < challengeManager.challenges.length; i++)
                 (() {
                   final challenge = challengeManager.challenges[i];
+                  if (!challenge.isClaimed) {
+                    _claimedChallenges.remove(i);
+                  }
                   final stepsTarget = challenge.getStepsTarget(stepsManager);
                   final description = challenge.getDescription(stepsManager);
                   double progress;
@@ -264,23 +269,25 @@ class _RewardsPageState extends State<RewardsPage> {
                       final bag = Provider.of<Bag>(context, listen: false);
                       bag.addItem(challenge.reward.item, challenge.reward.quantity);
 
+                      Future.delayed(const Duration(milliseconds: 300), () {
+                      if (!mounted) return;
                       setState(() {
-                        challengeManager.claimChallenge(challenge);
-                        //challenge.isClaimed = true;
-                        _claimedChallenges.add(i);
-                        _claimingChallenges.remove(i);
+                      challengeManager.claimChallenge(challenge);
+                      _claimedChallenges.add(i);
+                      _claimingChallenges.remove(i);
                       });
 
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(
-                            'Hai ricevuto ${challenge.reward.quantity}x ${challenge.reward.item.name}!',
+                      SnackBar(
+                      content: Text(
+                      'Hai ricevuto ${challenge.reward.quantity}x ${challenge.reward.item.name}!',
+                      ),
+                      behavior: SnackBarBehavior.floating,
+                      backgroundColor: Colors.green.shade600,
+                      duration: const Duration(seconds: 3),
                           ),
-                          behavior: SnackBarBehavior.floating,
-                          backgroundColor: Colors.green.shade600,
-                          duration: const Duration(seconds: 3),
-                        ),
                       );
+                      });
                     },
                   );
                 })(),

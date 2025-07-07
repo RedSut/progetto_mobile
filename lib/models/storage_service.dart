@@ -68,6 +68,17 @@ class StorageService {
     return prefs.getBool('petIsEgg') ?? true;
   }
 
+  // 📌 Salva il livello di evoluzione del pet (0 uovo, 1 Mostro, ...)
+  static Future<void> savePetEvolutionStage(int stage) async {
+    final prefs = await _prefs;
+    prefs.setInt('petEvolutionStage', stage);
+  }
+
+  static Future<int> getPetEvolutionStage() async {
+    final prefs = await _prefs;
+    return prefs.getInt('petEvolutionStage') ?? 0;
+  }
+
   // 📌 Salva l'ultimo aggiornamento dei valori del pet
   static Future<void> savePetLastUpdated(DateTime lastUpdated) async {
     final prefs = await SharedPreferences.getInstance();
@@ -155,7 +166,12 @@ class StorageService {
       for (var entry in decoded.entries) {
         final item = ItemManager().items.firstWhere(
               (element) => element.id == entry.key,
-          orElse: () => Item(id: 'unknown', name: 'Sconosciuto', imagePath: ''),
+          orElse: () => Item(
+            id: 'unknown',
+            name: 'Sconosciuto',
+            imagePath: '',
+            description: '',
+          ),
         );
         bag[item] = entry.value as int;
       }

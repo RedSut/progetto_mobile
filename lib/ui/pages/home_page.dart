@@ -24,10 +24,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _showStats = false;
+  bool _feedButtonScaling = false;
+  bool _rewardsButtonScaling = false;
   Timer? _mockStepTimer;
   int _previousLevel = -1;                          // livello precedente; -1 se non caricato
+  int _previousStage = -1;                          // evoluzione precedente
   bool _hatchDialogShown = false;
   late final Pet _pet;
+  bool? _wasHungry;
+  bool? _wasHappy;
 
   static const List<String> happyNotHungryPhrases = [
     'Oggi mi sento alla grande!',
@@ -88,6 +93,9 @@ class _HomePageState extends State<HomePage> {
     await _pet.loadPet();
     setState(() {
       _previousLevel = _pet.level;
+      _previousStage = _pet.evolutionStage;
+      _wasHungry = _pet.hunger < 50;
+      _wasHappy = _pet.happiness >= 50;
     });
 
     final hatchShown = await StorageService.getHatchShown();
@@ -107,15 +115,29 @@ class _HomePageState extends State<HomePage> {
     if (_pet.isEgg) {
       _phraseTimer?.cancel();
       if (_currentPhrase != eggPhrase) {
-        setState(() {
-          _currentPhrase = eggPhrase;
-        });
+        setState(() => _currentPhrase = eggPhrase);
       }
+      _wasHungry = null;
+      _wasHappy = null;
     } else {
       // Start phrase rotation only if not already active to avoid
       // restarting it whenever the pet's stats update.
       if (_phraseTimer == null) {
-        _changePhrase();
+        final isHungry = _pet.hunger < 50;
+        final isHappy = _pet.happiness >= 50;
+        final shouldUpdate =
+            _currentPhrase == eggPhrase ||
+                _wasHungry == null ||
+                isHungry != _wasHungry ||
+                isHappy != _wasHappy ||
+                _phraseTimer == null;
+
+        if (shouldUpdate) {
+          _changePhrase();
+        }
+
+        _wasHungry = isHungry;
+        _wasHappy = isHappy;
       }
     }
   }
@@ -183,9 +205,9 @@ class _HomePageState extends State<HomePage> {
                 children: const [
                   Text('🎉 Evoluzione!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   SizedBox(height: 16),
-                  Text('Il tuo pet si è schiuso!', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                  Text('Il tuo pet si è schiuso! Controlla la pagina delle statistiche.', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
                   SizedBox(height: 12),
-                  Text('Prenditene cura e fallo crescere! 🐣', textAlign: TextAlign.center),
+                  Text('Prenditene cura e fallo crescere! 🐒', textAlign: TextAlign.center),
                 ],
               ),
             ),
@@ -197,7 +219,60 @@ class _HomePageState extends State<HomePage> {
         });
       }
 
+    // ─── Evoluzione a Mostro1 (livello 25) ───
+    if (_previousStage != -1 &&
+        _previousStage == 1 &&
+        pet.evolutionStage == 2) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            contentPadding: const EdgeInsets.all(24),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text('🎉 Evolution!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                SizedBox(height: 16),
+                Text('Your pet has evolved!', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                SizedBox(height: 12),
+                Text('You are applying so much effort to take care of him! 🐒', textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        );
+      });
+    }
+
+    // ─── Evoluzione a Mostro2 (livello 50) ───
+    if (_previousStage != -1 &&
+        _previousStage == 2 &&
+        pet.evolutionStage == 3) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            contentPadding: const EdgeInsets.all(24),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text('🎉 Evolution!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                SizedBox(height: 16),
+                Text('Your pet has evolved!', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                SizedBox(height: 12),
+                Text('You are applying so much effort to take care of him! 🐒', textAlign: TextAlign.center),
+              ],
+            ),
+          ),
+        );
+      });
+    }
+
     _previousLevel = pet.level;
+    _previousStage = pet.evolutionStage;
 
     return Scaffold(
       appBar: AppBar(
@@ -365,8 +440,11 @@ class _HomePageState extends State<HomePage> {
                   ),
 
                   // pulsanti feed / rewards
-                  FilledButton(
-                    onPressed: () {
+                  AnimatedScale(
+                    scale: _feedButtonScaling ? 1.1 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: FilledButton(
+                      onPressed: () {
                       if (pet.isEgg){
                         showDialog(
                             context: context,
@@ -389,10 +467,15 @@ class _HomePageState extends State<HomePage> {
                             ),
                         );
                       }else{
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const FeedPage()),
-                        );
+                        setState(() => _feedButtonScaling = true);
+                        Future.delayed(const Duration(milliseconds: 200), () {
+                          if (!mounted) return;
+                          setState(() => _feedButtonScaling = false);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const FeedPage()),
+                          );
+                        });
                       }
                     },
                     style: FilledButton.styleFrom(
@@ -405,24 +488,34 @@ class _HomePageState extends State<HomePage> {
                     ),
                     child: const Text('Feed him'),
                   ),
+                  ),
                   const SizedBox(height: 12),
-                  OutlinedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const RewardsPage()),
-                      );
-                    },
-                    style: OutlinedButton.styleFrom(
-                      minimumSize: const Size(150, 44),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(22),
+                  AnimatedScale(
+                    scale: _rewardsButtonScaling ? 1.1 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: OutlinedButton(
+                      onPressed: () {
+                        setState(() => _rewardsButtonScaling = true);
+                        Future.delayed(const Duration(milliseconds: 200), () {
+                          if (!mounted) return;
+                          setState(() => _rewardsButtonScaling = false);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const RewardsPage()),
+                          );
+                        });
+                      },
+                      style: OutlinedButton.styleFrom(
+                        minimumSize: const Size(150, 44),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(22),
+                        ),
+                        backgroundColor: Colors.orange.shade100,
+                        foregroundColor: Colors.orange,
+                        side: const BorderSide(color: Colors.orange),
                       ),
-                      backgroundColor: Colors.orange.shade100,
-                      foregroundColor: Colors.orange,
-                      side: const BorderSide(color: Colors.orange),
+                      child: const Text('Claim rewards'),
                     ),
-                    child: const Text('Claim rewards'),
                   ),
                 ],
               ),
@@ -460,6 +553,7 @@ class _HomePageState extends State<HomePage> {
 
               setState(() {
                 _previousLevel = -1;
+                _previousStage = -1;
                 _hatchDialogShown = false;
               });
 

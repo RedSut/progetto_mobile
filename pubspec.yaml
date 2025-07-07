@@ -76,6 +76,8 @@ flutter:
   # https://flutter.dev/to/asset-from-package
   assets:
     - assets/Monster.png
+    - assets/Monster1.png
+    - assets/Monster2.png
     - assets/egg.png
     - assets/itemLeppa.png
     - assets/itemPecha.png

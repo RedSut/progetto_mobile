@@ -59,35 +59,59 @@ class BagPage extends StatelessWidget {
                 final item = entry.key;
                 final quantity = entry.value;
 
-                return Container(
-                  decoration: BoxDecoration(
-                    color: Colors.green.shade800,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  padding: const EdgeInsets.all(12),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset(
-                        item.imagePath,
-                        width: 80,
-                        height: 80,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        item.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                return InkWell(
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(item.name),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Image.asset(item.imagePath, width: 80, height: 80),
+                            const SizedBox(height: 8),
+                            Text(item.description),
+                          ],
                         ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Close'),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'x$quantity',
-                        style:
-                        const TextStyle(color: Colors.orange, fontSize: 18),
-                      ),
-                    ],
+                    );
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.green.shade800,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    padding: const EdgeInsets.all(12),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Image.asset(
+                          item.imagePath,
+                          width: 80,
+                          height: 80,
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          item.name,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'x$quantity',
+                          style:
+                          const TextStyle(color: Colors.orange, fontSize: 18),
+                        ),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),

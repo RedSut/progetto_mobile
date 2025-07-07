@@ -77,6 +77,22 @@ class _StatsPageState extends State<StatsPage> {
     );
   }
 
+  Widget _buildEvolutionImage(String asset, int stage, int currentStage) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: currentStage == stage ? Colors.orange : Colors.transparent,
+          width: 3,
+        ),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Image.asset(asset, width: 50, height: 50),
+    );
+  }
+
+
   @override
   Widget build(BuildContext context) {
     // Prendo l'istanza aggiornata di StepsManager da Provider
@@ -105,6 +121,32 @@ class _StatsPageState extends State<StatsPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                const Text(
+                  'Knowed evolution of pet:',
+                  style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for (int i = 0; i <= pet.evolutionStage; i++)
+                      _buildEvolutionImage(
+                        i == 0
+                            ? 'assets/egg.png'
+                            : i == 1
+                            ? 'assets/Monster.png'
+                            : i == 2
+                            ? 'assets/Monster1.png'
+                            : 'assets/Monster2.png',
+                        i,
+                        pet.evolutionStage,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 40),
                 _buildStatItem("Daily steps", stepsManager.dailySteps,
                     goal: stepsManager.dailyGoal),
                 const SizedBox(height: 40),
@@ -113,12 +155,12 @@ class _StatsPageState extends State<StatsPage> {
                 const SizedBox(height: 40),
                 _buildStatItem("Lifetime steps", stepsManager.steps,
                     showArc: false),
+                const SizedBox(height: 40),
               ],
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: SafeArea(
+      ),bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           color: const Color(0xFF688D92),
