@@ -191,7 +191,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      if (_showStats)
+                      if (_showStats && !pet.isEgg) // se è un uovo non mostro neanche le statistiche
                         Positioned(
                           top: -110,
                           child: Material(
@@ -254,10 +254,33 @@ class _HomePageState extends State<HomePage> {
                   // pulsanti feed / rewards
                   FilledButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (_) => const FeedPage()),
-                      );
+                      if (pet.isEgg){
+                        showDialog(
+                            context: context,
+                            barrierDismissible: true,
+                            builder: (_) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              contentPadding: const EdgeInsets.all(24),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text('Aspetta che il tuo pet si schiuda prima di dargli da mangiare!',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                  SizedBox(height: 12),
+                                  Text('La schiusura dell\'uovo accadrà quando avrai raggiunto il livello 1',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(fontSize: 16)),
+                                ],
+                              ),
+                            ),
+                        );
+                      }else{
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const FeedPage()),
+                        );
+                      }
                     },
                     style: FilledButton.styleFrom(
                       minimumSize: const Size(150, 44),
