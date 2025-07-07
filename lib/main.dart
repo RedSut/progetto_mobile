@@ -26,26 +26,27 @@ class PetStepsApp extends StatelessWidget {                           // Widget 
   @override
   Widget build(BuildContext context) {                                // Descrive l’albero di widget
     return MultiProvider(                                             // Consente più provider a livello globale
-      providers: [                                                    // Elenco dei provider disponibili
+        providers: [                                                    // Elenco dei provider disponibili
         ChangeNotifierProvider(create: (_) => Pet()),                 // Istanza di Pet, osservabile dai widget
-        ChangeNotifierProxyProvider<Pet, StepsManager>(
-          create: (context) => StepsManager(context.read<Pet>()),
-          update: (_, pet, stepsMgr) {
-            stepsMgr!.pet = pet;
-            return stepsMgr;
-          },
-        ),        // Istanza di StepsManager collegata al Pet
-        ChangeNotifierProvider(create: (_) => Bag()),
-        ChangeNotifierProvider(create: (_) => ChallengeManager()),
-      ],
-      child: MaterialApp(                                             // App Material (gestisce routing, tema, ecc.)
-        title: 'Pet Steps',                                           // Titolo mostrato su Android task-switcher
-        theme: ThemeData(                                             // Tema globale per colori e stile
-          colorSchemeSeed: Colors.indigo,                             // Seed per generare palette Material 3
-          useMaterial3: true,                                         // Abilita componenti Material You
-        ),
-        home: const HomePage(),                                       // Prima schermata visualizzata
-      ),
+    ChangeNotifierProvider(create: (_) => ChallengeManager()),
+    ChangeNotifierProxyProvider2<Pet, ChallengeManager, StepsManager>(
+      create: (context) => StepsManager(context.read<Pet>()),
+      update: (_, pet, chMgr, stepsMgr) {
+        stepsMgr!.pet = pet;
+        stepsMgr.challengeManager = chMgr;
+        return stepsMgr;
+      },
+    ),        // Istanza di StepsManager collegata al Pet e ChallengeManager
+    ChangeNotifierProvider(create: (_) => Bag()),
+    ],
+    child: MaterialApp(                                             // App Material (gestisce routing, tema, ecc.)
+    title: 'Pet Steps',                                           // Titolo mostrato su Android task-switcher
+    theme: ThemeData(                                             // Tema globale per colori e stile
+    colorSchemeSeed: Colors.indigo,                             // Seed per generare palette Material 3
+    useMaterial3: true,                                         // Abilita componenti Material You
+    ),
+    home: const HomePage(),                                       // Prima schermata visualizzata
+    ),
     );
+    }
   }
-}

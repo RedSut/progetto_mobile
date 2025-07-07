@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:progetto_mobile/models/item.dart';
 import 'package:progetto_mobile/models/steps.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
+import 'package:flutter/foundation.dart';
 
 import 'reward.dart';
 
@@ -21,10 +22,14 @@ class Challenge {
   });
 
   int getStepsTarget(StepsManager stepsManager) {
-    if (id == 'daily') {
+    if (id == 'daily' || id == 'daily_leppa' || id == 'daily_rowap') {
       return stepsManager.dailyGoal;
     } else if (id == 'weekly') {
       return stepsManager.weeklyGoal;
+    } else if (id == 'hourly') {
+      return stepsManager.hourlyGoal;
+    } else if (id == 'minute') {
+      return stepsManager.minuteGoal;
     } else {
       return steps ?? 0;
     }
@@ -32,11 +37,15 @@ class Challenge {
 
   String getDescription(StepsManager stepsManager) {
     final target = getStepsTarget(stepsManager);
-    if (id == 'daily') {
+    if (id == 'daily' || id == 'daily_leppa' || id == 'daily_rowap') {
       return 'Walk for a total of $target steps today.';
     } else if (id == 'weekly') {
       return 'Walk for a total of $target steps this week.';
-    } else {
+    } else if (id == 'hourly') {
+      return 'Walk for a total of $target steps this hour.';
+    } else if (id == 'minute') {
+      return 'Walk for a total of $target steps this minute.';
+    }  else {
       return 'Walk for a total of $target steps.';
     }
   }
@@ -45,11 +54,56 @@ class Challenge {
 class ChallengeManager extends ChangeNotifier{
   final List<Challenge> challenges = [
     Challenge(
+      id: 'minute',
+      title: 'Minute Challenge',
+      reward: Reward(
+        id: 'rew_m1',
+        item: ItemManager().getItemById('it_001'),
+        quantity: 1,
+      ),
+    ),
+    Challenge(
+      id: 'hourly',
+      title: 'Hourly Challenge',
+      reward: Reward(
+        id: 'rew_h1',
+        item: ItemManager().getItemById('it_001'),
+        quantity: 1,
+      ),
+    ),
+    Challenge(
+      id: 'hourly',
+      title: 'Hourly Challenge',
+      reward: Reward(
+        id: 'rew_h1',
+        item: ItemManager().getItemById('it_001'),
+        quantity: 1,
+      ),
+    ),
+    Challenge(
       id: 'daily',
-      title: 'Daily Challenge',
+      title: 'Daily Pecha Challenge',
       reward: Reward(
         id: 'rew_001',
         item: ItemManager().getItemById("it_001"),
+        quantity: 5,
+      ),
+    ),
+    Challenge(
+      id: 'daily_leppa',
+      title: 'Daily Leppa Challenge',
+      reward: Reward(
+        id: 'rew_003',
+        item: ItemManager().getItemById('it_002'),
+        quantity: 5,
+      ),
+    ),
+    Challenge(
+      id: 'daily_rowap',
+      title: 'Daily Rowap Challenge',
+      reward: Reward(
+        id: 'rew_004',
+        item: ItemManager().getItemById('it_003'),
         quantity: 5,
       ),
     ),
@@ -108,6 +162,18 @@ class ChallengeManager extends ChangeNotifier{
     claimedIds.add(challenge.id);
     await StorageService.saveClaimedChallenges(claimedIds);
     notifyListeners();
+  }
+
+  Future<void> unclaimChallengeById(String id) async {
+    try {
+      final challenge = challenges.firstWhere((c) => c.id == id);
+      if (!challenge.isClaimed) return;
+      challenge.isClaimed = false;
+      await StorageService.removeClaimedChallenge(id);
+      notifyListeners();
+    } catch (_) {
+      // Challenge non trovata
+    }
   }
 
   Future<void> resetClaimedChallenges() async {

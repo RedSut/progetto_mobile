@@ -21,6 +21,8 @@ class _RewardsPageState extends State<RewardsPage> {
   // Durate per il tempo rimanente di daily e weekly challenge
   Duration dailyRemaining = const Duration();
   Duration weeklyRemaining = const Duration();
+  Duration hourlyRemaining = const Duration();
+  Duration minuteRemaining = const Duration();
   // Timer periodico che aggiorna i countdown ogni minuto
   Timer? timer;
 
@@ -42,6 +44,12 @@ class _RewardsPageState extends State<RewardsPage> {
     // Prossima mezzanotte per la daily challenge
     final nextMidnight = DateTime(now.year, now.month, now.day + 1);
 
+    // Prossima ora per la hourly challenge
+    final nextHour = DateTime(now.year, now.month, now.day, now.hour + 1);
+
+    // Prossimo minuto per la minute challenge
+    final nextMinute = DateTime(now.year, now.month, now.day, now.hour, now.minute + 1);
+
     // Prossimo lunedì a mezzanotte per la weekly challenge
     final nextMonday = DateTime(now.year, now.month, now.day)
         .add(Duration(days: (8 - now.weekday) % 7 == 0 ? 7 : (8 - now.weekday) % 7));
@@ -51,16 +59,26 @@ class _RewardsPageState extends State<RewardsPage> {
       dailyRemaining = nextMidnight.difference(now);
       weeklyRemaining = DateTime(nextMonday.year, nextMonday.month, nextMonday.day)
           .difference(now);
+      hourlyRemaining = nextHour.difference(now);
+      minuteRemaining = nextMinute.difference(now);
     });
     // Ottieni challengeManager dal context
     final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
 
     // Se siamo entro 1 minuto dalla mezzanotte, resetta i claim delle daily e delle weekly
     if (dailyRemaining.inSeconds <= 60) {
-      challengeManager.challenges[0].isClaimed = false;
+      challengeManager.unclaimChallengeById('daily');
+      challengeManager.unclaimChallengeById('daily_leppa');
+      challengeManager.unclaimChallengeById('daily_rowap');
     }
     if (weeklyRemaining.inSeconds <= 60) {
-      challengeManager.challenges[1].isClaimed = false;
+      challengeManager.unclaimChallengeById('weekly');
+    }
+    if (hourlyRemaining.inSeconds <= 60) {
+      challengeManager.unclaimChallengeById('hourly');
+    }
+    if (minuteRemaining.inSeconds <= 60) {
+      challengeManager.unclaimChallengeById('minute');
     }
   }
 
@@ -213,10 +231,16 @@ class _RewardsPageState extends State<RewardsPage> {
                   final description = challenge.getDescription(stepsManager);
                   double progress;
                   String duration = "";
-                  if (i == 0) {
+                  if (challenge.id == 'minute') {
+                    progress = stepsManager.minuteProgress.clamp(0.0, 1.0);
+                    duration = '- ${_formatDuration(minuteRemaining)}';
+                  } else if (challenge.id == 'hourly') {
+                    progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
+                    duration = '- ${_formatDuration(hourlyRemaining)}';
+                  } else if (challenge.id == 'daily' || challenge.id == 'daily_leppa' || challenge.id == 'daily_rowap') {
                     progress = stepsManager.dailyProgress.clamp(0.0, 1.0);
                     duration = '- ${_formatDuration(dailyRemaining)}';
-                  } else if (i == 1) {
+                  } else if (challenge.id == 'weekly') {
                     progress = stepsManager.weeklyProgress.clamp(0.0, 1.0);
                     duration = '- ${_formatDuration(weeklyRemaining)}';
                   } else {

@@ -18,6 +18,28 @@ class StorageService {
     return prefs.getInt('dailySteps') ?? 0;
   }
 
+  // 📌 Salva i passi orari
+  static Future<void> saveHourlySteps(int steps) async {
+    final prefs = await _prefs;
+    prefs.setInt('hourlySteps', steps);
+  }
+
+  static Future<int> getHourlySteps() async {
+    final prefs = await _prefs;
+    return prefs.getInt('hourlySteps') ?? 0;
+  }
+
+  // 📌 Salva i passi al minuto
+  static Future<void> saveMinuteSteps(int steps) async {
+    final prefs = await _prefs;
+    prefs.setInt('minuteSteps', steps);
+  }
+
+  static Future<int> getMinuteSteps() async {
+    final prefs = await _prefs;
+    return prefs.getInt('minuteSteps') ?? 0;
+  }
+
   // 📌 Salva i passi settimanali
   static Future<void> saveWeeklySteps(int steps) async {
     final prefs = await _prefs;
@@ -152,6 +174,62 @@ class StorageService {
   static Future<List<String>> getClaimedChallenges() async {
     final prefs = await _prefs;
     return prefs.getStringList('claimedChallenges') ?? [];
+  }
+
+  // Rimuove una challenge dalla lista delle completate
+  static Future<void> removeClaimedChallenge(String id) async {
+    final prefs = await _prefs;
+    final claimed = prefs.getStringList('claimedChallenges') ?? [];
+    claimed.remove(id);
+    prefs.setStringList('claimedChallenges', claimed);
+  }
+
+  // Salva l'ultima data di reset giornaliero
+  static Future<void> saveLastDailyReset(DateTime date) async {
+    final prefs = await _prefs;
+    prefs.setString('lastDailyReset', date.toIso8601String());
+  }
+
+  static Future<DateTime> getLastDailyReset() async {
+    final prefs = await _prefs;
+    final stored = prefs.getString('lastDailyReset');
+    return stored != null ? DateTime.tryParse(stored) ?? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
+  // Salva l'ultima data di reset settimanale
+  static Future<void> saveLastWeeklyReset(DateTime date) async {
+    final prefs = await _prefs;
+    prefs.setString('lastWeeklyReset', date.toIso8601String());
+  }
+
+  static Future<DateTime> getLastWeeklyReset() async {
+    final prefs = await _prefs;
+    final stored = prefs.getString('lastWeeklyReset');
+    return stored != null ? DateTime.tryParse(stored) ?? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
+  // Salva l'ultima data di reset orario
+  static Future<void> saveLastHourlyReset(DateTime date) async {
+    final prefs = await _prefs;
+    prefs.setString('lastHourlyReset', date.toIso8601String());
+  }
+
+  static Future<DateTime> getLastHourlyReset() async {
+    final prefs = await _prefs;
+    final stored = prefs.getString('lastHourlyReset');
+    return stored != null ? DateTime.tryParse(stored) ?? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(0);
+  }
+
+  // Salva l'ultima data di reset al minuto
+  static Future<void> saveLastMinuteReset(DateTime date) async {
+    final prefs = await _prefs;
+    prefs.setString('lastMinuteReset', date.toIso8601String());
+  }
+
+  static Future<DateTime> getLastMinuteReset() async {
+    final prefs = await _prefs;
+    final stored = prefs.getString('lastMinuteReset');
+    return stored != null ? DateTime.tryParse(stored) ?? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(0);
   }
 
   // 📌 Salva il dayly goal
