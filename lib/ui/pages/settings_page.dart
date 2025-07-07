@@ -37,46 +37,97 @@ class _SettingsPageState extends State<SettingsPage> {
     await StorageService.saveDailyGoal(dailyGoal);
     await StorageService.saveWeeklyGoal(weeklyGoal);
 
+    Navigator.pop(context); // chiude il drawer se è aperto
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Goals updated!')),
+      SnackBar(
+        content: const Text('Goals updated!',
+          style: TextStyle(
+            color: Colors.black,
+          ),
+        ),
+        backgroundColor: Colors.orange.shade200,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final primaryColor = Colors.orange.shade200;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
+        backgroundColor: primaryColor,
+        elevation: 0,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 36),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: _dailyController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Dayly Goal (steps)',
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _weeklyController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(
-                labelText: 'Weekly goal (steps)',
+            Text(
+              'Set Your Goals',
+              style: TextStyle(
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange,
               ),
             ),
             const SizedBox(height: 32),
-            ElevatedButton(
-              onPressed: () async {
-                await _saveGoals();
-                // Ricarica i goal nel StepsManager
-                final stepsManager = Provider.of<StepsManager>(context, listen: false);
-                await stepsManager.loadGoals();
-                Navigator.pop(context);
-              },
-              child: const Text('Save'),
+            TextField(
+              controller: _dailyController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Daily Goal (steps)',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: primaryColor, width: 2),
+                ),
+                prefixIcon: const Icon(Icons.directions_walk),
+              ),
+            ),
+            const SizedBox(height: 24),
+            TextField(
+              controller: _weeklyController,
+              keyboardType: TextInputType.number,
+              decoration: InputDecoration(
+                labelText: 'Weekly Goal (steps)',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide(color: primaryColor, width: 2),
+                ),
+                prefixIcon: const Icon(Icons.calendar_view_week),
+              ),
+            ),
+            const SizedBox(height: 48),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () async {
+                  await _saveGoals();
+                  final stepsManager = Provider.of<StepsManager>(context, listen: false);
+                  await stepsManager.loadGoals();
+                  Navigator.pop(context);
+                },
+                style: ElevatedButton.styleFrom(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  backgroundColor: primaryColor,
+                  elevation: 4,
+                ),
+                child: const Text(
+                  'Save',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black),
+                ),
+              ),
             ),
           ],
         ),

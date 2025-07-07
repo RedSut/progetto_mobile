@@ -179,6 +179,7 @@ class _RewardsPageState extends State<RewardsPage> {
     return Scaffold(
       backgroundColor: Colors.green.shade900, // Colore sfondo schermata
       appBar: AppBar(
+        foregroundColor: Colors.orange,
         backgroundColor: Colors.green.shade900, // Colore sfondo AppBar
         title: const Text(
           'Rewards',

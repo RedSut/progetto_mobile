@@ -22,6 +22,7 @@ class BagPage extends StatelessWidget {
           title: const Text('La tua Borsa', style: TextStyle(color: Colors.white),),
           backgroundColor: Colors.green.shade900,
           elevation: 0,
+          foregroundColor: Colors.white,
         ),
         body: GestureDetector(
           onVerticalDragEnd: (details) {
