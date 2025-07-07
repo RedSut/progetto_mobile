@@ -72,15 +72,6 @@ class ChallengeManager extends ChangeNotifier{
       ),
     ),
     Challenge(
-      id: 'hourly',
-      title: 'Hourly Challenge',
-      reward: Reward(
-        id: 'rew_h1',
-        item: ItemManager().getItemById('it_001'),
-        quantity: 1,
-      ),
-    ),
-    Challenge(
       id: 'daily',
       title: 'Daily Pecha Challenge',
       reward: Reward(

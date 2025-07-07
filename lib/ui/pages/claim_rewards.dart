@@ -65,20 +65,29 @@ class _RewardsPageState extends State<RewardsPage> {
     // Ottieni challengeManager dal context
     final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
 
-    // Se siamo entro 1 minuto dalla mezzanotte, resetta i claim delle daily e delle weekly
+    // Se siamo entro 1 minuto dal reset, rimuove i claim sia a livello di
+    // ChallengeManager che degli indici salvati localmente per la UI
+    void removeClaim(String id) {
+      for (var i = 0; i < challengeManager.challenges.length; i++) {
+        if (challengeManager.challenges[i].id == id) {
+          _claimedChallenges.remove(i);
+        }
+      }
+      challengeManager.unclaimChallengeById(id);
+    }
     if (dailyRemaining.inSeconds <= 60) {
-      challengeManager.unclaimChallengeById('daily');
-      challengeManager.unclaimChallengeById('daily_leppa');
-      challengeManager.unclaimChallengeById('daily_rowap');
+      removeClaim('daily');
+      removeClaim('daily_leppa');
+      removeClaim('daily_rowap');
     }
     if (weeklyRemaining.inSeconds <= 60) {
-      challengeManager.unclaimChallengeById('weekly');
+      removeClaim('weekly');
     }
     if (hourlyRemaining.inSeconds <= 60) {
-      challengeManager.unclaimChallengeById('hourly');
+      removeClaim('hourly');
     }
     if (minuteRemaining.inSeconds <= 60) {
-      challengeManager.unclaimChallengeById('minute');
+      removeClaim('minute');
     }
   }
 
@@ -207,15 +216,6 @@ class _RewardsPageState extends State<RewardsPage> {
             fontSize: 26,
           ),
         ),
-        actions: [
-          // Bottone refresh manuale
-          IconButton(
-            onPressed: () {
-              _updateTimes(); // Aggiorna tempi manualmente
-            },
-            icon: const Icon(Icons.refresh, color: Colors.orange),
-          )
-        ],
         elevation: 0, // Nessuna ombra sotto la AppBar
       ),
       body: Padding(
