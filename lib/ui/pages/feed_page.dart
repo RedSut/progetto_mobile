@@ -73,6 +73,8 @@ class _FeedPageState extends State<FeedPage> {
   @override
   Widget build(BuildContext context) {
     final pet = context.watch<Pet>();
+    final hour = DateTime.now().hour;
+    final isDayTime = hour >= 6 && hour < 18;
 
     return Scaffold(
       appBar: AppBar(title: const Text('Feed'),
@@ -81,7 +83,9 @@ class _FeedPageState extends State<FeedPage> {
         fit: StackFit.expand,
         children: [
           Image.asset(
-            'assets/imagePratoDay.png',
+            isDayTime
+                ? 'assets/imageCucciaDay.png'
+                : 'assets/imageCucciaNight.png',
             fit: BoxFit.cover,
           ),
           Container(
@@ -91,7 +95,9 @@ class _FeedPageState extends State<FeedPage> {
             children: [
               const SizedBox(height: 24),
               Text('Fame: ${pet.hunger}/100',
-                  style: Theme.of(context).textTheme.titleMedium),
+                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Colors.white,
+                  ),),
               const SizedBox(height: 16),
               LinearProgressIndicator(
                 value: pet.hunger / 100,
