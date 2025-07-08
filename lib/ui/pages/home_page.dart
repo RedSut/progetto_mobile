@@ -7,6 +7,7 @@ import 'package:progetto_mobile/models/challenge.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
 import 'package:progetto_mobile/ui/pages/settings_page.dart';
 import 'package:provider/provider.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 import '../../models/bag.dart';
 import '../../models/pet.dart';
@@ -36,6 +37,13 @@ class _HomePageState extends State<HomePage> {
   late final Pet _pet;
   bool? _wasHungry;
   bool? _wasHappy;
+  bool _tutorialStarted = false;
+  final GlobalKey _playKey = GlobalKey();
+  final GlobalKey _feedKey = GlobalKey();
+  final GlobalKey _rewardsKey = GlobalKey();
+  final GlobalKey _menuKey = GlobalKey();
+  final GlobalKey _petKey = GlobalKey();
+  final GlobalKey _helpKey = GlobalKey();
 
   static const List<String> happyNotHungryPhrases = [
     'Today I am feeling great!',
@@ -113,6 +121,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _hatchDialogShown = hatchShown;
     });
+    final tutorialShown = await StorageService.getHomeTutorialShown();
+    if (!tutorialShown && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showTutorial());
+    }
 
     _updatePhrase();
   }
@@ -183,6 +195,285 @@ class _HomePageState extends State<HomePage> {
     _phraseTimer = Timer(const Duration(seconds: 30), _changePhrase);
   }
 
+  void _showTutorial() {
+    if (_tutorialStarted) return;
+    _tutorialStarted = true;
+    final size = MediaQuery.of(context).size;
+
+    final targets = [
+      TargetFocus(
+        identify: 'welcome',
+        targetPosition: TargetPosition(
+          Size.zero,
+          Offset(size.width / 2, size.height / 2),
+        ),
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Welcome to Pet Steps!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'You have recived a strange egg, try to hatch it! It will become your personal pet, '
+                  'so take care of him while you stay active.\n'
+                  'Click on the buttons to complete the tutorial!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'pet-status',
+        keyTarget: _petKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Pet status',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'This is your pet! Hold the pet to see if he\'s happy or hungry. Remember that eggs have nothing to say,'
+                  ' so try to hatch it!',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'play',
+        keyTarget: _playKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Play',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Here you can play a minigame with your pet, when the egg will hatch.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'feed',
+        keyTarget: _feedKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Feed him',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Remember to don\'t let him starve. Of course, for now, you cant feed an egg.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'rewards',
+        keyTarget: _rewardsKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Claim rewards',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Collect prizes for your steps progress.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'menu',
+        keyTarget: _menuKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Side menu',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Swipe right or tap here to open settings.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'bag',
+        targetPosition: TargetPosition(
+          Size.zero,
+          Offset(size.width / 2, size.height * 0.8),
+        ),
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Bag',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Swipe up to open your bag.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'stats',
+        targetPosition: TargetPosition(
+          Size.zero,
+          Offset(size.width * 0.8, size.height / 2),
+        ),
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Statistics',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Swipe left to view your progress.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'help',
+        keyTarget: _helpKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Need help?',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Click here to see the menu again.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ];
+
+    TutorialCoachMark(
+      targets: targets,
+      colorShadow: Colors.black,
+      textSkip: 'SKIP',
+      hideSkip: false,
+      onFinish: () {
+        StorageService.saveHomeTutorialShown(true);
+      },
+      onSkip: () {
+        StorageService.saveHomeTutorialShown(true);
+        return true;
+      },
+    ).show(context: context);
+  }
+
   @override
   void dispose() {
     _mockStepTimer?.cancel();
@@ -224,13 +515,14 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'Your egg is hatched! Check the stats page.',
+                  'Your egg is hatched!',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 18),
                 ),
                 SizedBox(height: 12),
                 Text(
-                  'Take care of your pet and grow him up! 🐒',
+                  'Now you can take care of your pet, play with him and grow it up! 🐒'
+                  ' Remember that you can see his feelings just holding on him.',
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -327,6 +619,23 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Pet Steps'),
         backgroundColor: Colors.orange.shade200,
+        leading: Builder(
+          builder: (context) => IconButton(
+            key: _menuKey,
+            icon: const Icon(Icons.menu),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
+        ),
+        actions: [
+          IconButton(
+            key: _helpKey,
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              setState(() => _tutorialStarted = false);
+              _showTutorial();
+            },
+          ),
+        ],
       ),
       drawer: const _AppDrawer(),
       drawerEdgeDragWidth: 30.0,
@@ -400,6 +709,7 @@ class _HomePageState extends State<HomePage> {
                 scale: _playButtonScaling ? 1.1 : 1.0,
                 duration: const Duration(milliseconds: 200),
                 child: ElevatedButton.icon(
+                  key: _playKey,
                   onPressed: () {
                     final pet = context.read<Pet>();
                     if (pet.isEgg) {
@@ -460,6 +770,7 @@ class _HomePageState extends State<HomePage> {
                     clipBehavior: Clip.none,
                     children: [
                       GestureDetector(
+                        key: _petKey,
                         onLongPressStart: (_) =>
                             setState(() => _showStats = true),
                         onLongPressEnd: (_) =>
@@ -569,6 +880,7 @@ class _HomePageState extends State<HomePage> {
                     scale: _feedButtonScaling ? 1.1 : 1.0,
                     duration: const Duration(milliseconds: 200),
                     child: FilledButton(
+                      key: _feedKey,
                       onPressed: () {
                         if (pet.isEgg) {
                           showDialog(
@@ -630,6 +942,7 @@ class _HomePageState extends State<HomePage> {
                     scale: _rewardsButtonScaling ? 1.1 : 1.0,
                     duration: const Duration(milliseconds: 200),
                     child: OutlinedButton(
+                      key: _rewardsKey,
                       onPressed: () {
                         setState(() => _rewardsButtonScaling = true);
                         Future.delayed(const Duration(milliseconds: 200), () {
