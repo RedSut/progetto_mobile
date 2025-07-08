@@ -23,8 +23,8 @@ class GamePage extends StatefulWidget {
 
 class _GamePageState extends State<GamePage> {
   static const double _gravity = 0.4;
-  static const double _jumpVelocity = -20;
-  static const double _petSize = 60;
+  static const double _jumpVelocity = -16;
+  static const double _petSize = 75;
 
   late double _petX;
   late double _petY;
