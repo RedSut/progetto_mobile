@@ -86,7 +86,7 @@ class ChallengeManager extends ChangeNotifier{
       reward: Reward(
         id: 'rew_003',
         item: ItemManager().getItemById('it_002'),
-        quantity: 5,
+        quantity: 7,
       ),
     ),
     Challenge(
@@ -95,7 +95,7 @@ class ChallengeManager extends ChangeNotifier{
       reward: Reward(
         id: 'rew_004',
         item: ItemManager().getItemById('it_003'),
-        quantity: 5,
+        quantity: 10,
       ),
     ),
     Challenge(
@@ -103,8 +103,8 @@ class ChallengeManager extends ChangeNotifier{
       title: 'Weekly Challenge',
       reward: Reward(
         id: 'rew_002',
-        item: ItemManager().getItemById("it_002"),
-        quantity: 20,
+        item: ItemManager().getItemById("it_001"),
+        quantity: 35,
       ),
     ),
     Challenge(
@@ -122,8 +122,8 @@ class ChallengeManager extends ChangeNotifier{
       title: 'Runner',
       reward: Reward(
         id: 'rew_002',
-        item: ItemManager().getItemById("it_001"),
-        quantity: 20,
+        item: ItemManager().getItemById("it_002"),
+        quantity: 25,
       ),
       steps: 10000,
     ),
@@ -132,8 +132,8 @@ class ChallengeManager extends ChangeNotifier{
       title: 'Workaholic',
       reward: Reward(
         id: 'rew_002',
-        item: ItemManager().getItemById("it_002"),
-        quantity: 30,
+        item: ItemManager().getItemById("it_001"),
+        quantity: 50,
       ),
       steps: 100000,
     ),

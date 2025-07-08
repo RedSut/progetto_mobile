@@ -113,6 +113,8 @@ class StepsManager extends ChangeNotifier {
   Future<void> loadGoals() async {
     dailyGoal = await StorageService.getDailyGoal();
     weeklyGoal = await StorageService.getWeeklyGoal();
+    hourlyGoal = (dailyGoal/4).round();
+    minuteGoal = (hourlyGoal/10).round();
     notifyListeners();
   }
 

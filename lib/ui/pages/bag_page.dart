@@ -19,7 +19,7 @@ class BagPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.green.shade900,
         appBar: AppBar(
-          title: const Text('Your bag', style: TextStyle(color: Colors.white),),
+          title: const Text('La tua Borsa', style: TextStyle(color: Colors.white),),
           backgroundColor: Colors.green.shade900,
           elevation: 0,
           foregroundColor: Colors.white,
@@ -41,10 +41,10 @@ class BagPage extends StatelessWidget {
               child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
-                    Text('Your bag is empty!',
+                    Text('La tua borsa è vuota!',
                       style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
                     SizedBox(height: 16),
-                    Text('Try to complete some challenges or claim the already finished ones.',
+                    Text('Prova a completare quanche challenge o ritirare le ricompense di quelle già completate',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.white, fontSize: 20, fontStyle: FontStyle.italic)),
                   ]

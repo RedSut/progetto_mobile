@@ -223,6 +223,7 @@ class _HomePageState extends State<HomePage> {
           ).then((_) {
           _hatchDialogShown = true;
           StorageService.saveHatchShown(true);
+          _changePhrase();
           });
         });
       }
