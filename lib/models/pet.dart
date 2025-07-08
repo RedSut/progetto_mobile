@@ -130,6 +130,11 @@ class Pet extends ChangeNotifier {
     }
 
     if (level >= 100) _xp = 0;
+
+    // Save the updated stats and notify listeners so that the UI
+    // can react immediately when the pet evolves.
+    savePet();
+    notifyListeners();
   }
 
   void feed(int foodValue) {

@@ -21,19 +21,18 @@ class FeedPage extends StatefulWidget {
 
 
   static const List<String> veryHungryPhrases = [
-    'Sto morendo di fame...',
-    'Mi sento debole, ho bisogno di cibo!',
-    'Per favore, fammi mangiare presto!',
-    'Ho il vuoto nello stomaco!',
-    'Non resisto più dalla fame!'
+    "I'm really hungry...",
+    'Feeling weak, i need food!',
+    'Can you please feed me?',
+    'I have an emptiness in my stomach!',
+    'I can\'t stand the hunger anymore!'
   ];
 
   static const List<String> normalHungryPhrases = [
-    'Potrei mangiare qualcosina.',
-    'Un altro boccone non sarebbe male.',
-    'Non ho molta fame, ma potrei assaggiare qualcosa.',
-    'Sono abbastanza sazio, grazie!',
-    'Forse più tardi avrò fame.'
+    'Maybe I could have a snack.',
+    'I\'m not so much hungry.',
+    'I\'m pretty full, thanks!',
+    'Maybe later I\'ll be hungry.'
   ];
 
   @override
@@ -105,7 +104,7 @@ class _FeedPageState extends State<FeedPage> {
           Column(
             children: [
               const SizedBox(height: 24),
-              Text('Fame: ${pet.hunger}/100',
+              Text('Hunger: ${pet.hunger}/100',
                   style: Theme.of(context).textTheme.titleMedium!.copyWith(
                     color: Colors.white,
                   ),),
@@ -177,7 +176,6 @@ class _FeedPageState extends State<FeedPage> {
                     child: Text(
                       _currentPhrase,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontStyle: FontStyle.italic),
                     ),
                   ),
                 ],
@@ -200,10 +198,10 @@ class _FeedPageState extends State<FeedPage> {
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
                             children: const [
-                              Text('La tua borsa è vuota!',
+                              Text('You have no food!',
                                 style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
                               SizedBox(height: 16),
-                              Text('Prova a completare quanche challenge o ritirare le ricompense di quelle già completate',
+                              Text('Try to complete some challenges or claim the already finished ones.',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(color: Colors.black, fontSize: 20, fontStyle: FontStyle.italic)),
                             ]
@@ -230,7 +228,7 @@ class _FeedPageState extends State<FeedPage> {
                                 if (pet.hunger >= 100) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
-                                      content: Text('Il tuo pet è già sazio!'),
+                                      content: Text('Your pet is already full!'),
                                       duration: Duration(seconds: 1),
                                     ),
                                   );
@@ -255,7 +253,7 @@ class _FeedPageState extends State<FeedPage> {
                                   });
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('${food.name} dato al pet!'),
+                                      content: Text('${food.name} given to the pet!'),
                                       duration: const Duration(seconds: 1),
                                     ),
                                   );

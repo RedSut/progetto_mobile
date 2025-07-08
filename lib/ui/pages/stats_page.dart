@@ -15,12 +15,12 @@ class StatsPage extends StatefulWidget {
 
 class _StatsPageState extends State<StatsPage> {
   final List<String> motivationalPhrases = [
-    "Grande energia oggi!",
-    "Continua così, sei una macchina!",
-    "Ogni passo conta!",
-    "Il tuo pet è fiero di te!",
-    "Sei sulla strada giusta!",
-    "Ottimo ritmo, non fermarti!"
+    "Great energy today!",
+    "Keep going, you are great!",
+    "Every step count!",
+    "Your pet is proud of you!",
+    "You are in the right way!",
+    "Great, don't stop!"
   ];
 
   late String currentPhrase;
@@ -147,13 +147,13 @@ class _StatsPageState extends State<StatsPage> {
                   ],
                 ),
                 const SizedBox(height: 40),
-                _buildStatItem("Daily steps", stepsManager.dailySteps,
+                _buildStatItem("Daily steps to the goal:", stepsManager.dailyGoal - stepsManager.dailySteps,
                     goal: stepsManager.dailyGoal),
-                const SizedBox(height: 40),
-                _buildStatItem("Weekly steps", stepsManager.weeklySteps,
+                 SizedBox(height: 40),
+                _buildStatItem("Weekly steps to the goal:", stepsManager.weeklyGoal - stepsManager.weeklySteps,
                     goal: stepsManager.weeklyGoal),
                 const SizedBox(height: 40),
-                _buildStatItem("Lifetime steps", stepsManager.steps,
+                _buildStatItem("Lifetime steps", stepsManager.lifetimeSteps,
                     showArc: false),
                 const SizedBox(height: 40),
               ],

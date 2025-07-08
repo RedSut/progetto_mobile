@@ -1,6 +1,6 @@
 {
-    "name": "progetto_mobile",
-    "short_name": "progetto_mobile",
+    "name": "Pet Steps",
+    "short_name": "Pet Steps",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

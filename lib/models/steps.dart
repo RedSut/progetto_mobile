@@ -6,7 +6,6 @@ import 'challenge.dart';
 import 'package:pedometer/pedometer.dart';                // sensore pedometro reale
 import 'package:permission_handler/permission_handler.dart';
 
-// TODO: da capire come linkare bene con pet, forse basta chiamare i due metodi ogni volta che si aggiornano i passi
 class StepsManager extends ChangeNotifier {
   Pet pet;
   ChallengeManager? challengeManager;
@@ -31,6 +30,7 @@ class StepsManager extends ChangeNotifier {
 
   int get steps => _steps;
   int get dailySteps => _dailySteps;
+  int get lifetimeSteps => _steps;
   int get weeklySteps => _weeklySteps;
   int get hourlySteps => _hourlySteps;
   int get minuteSteps => _minuteSteps;
@@ -234,8 +234,8 @@ class StepsManager extends ChangeNotifier {
   }
 
   bool _isSameWeek(DateTime a, DateTime b) {
-    final weekDayA = a.subtract(Duration(days: a.weekday));
-    final weekDayB = b.subtract(Duration(days: b.weekday));
+    final weekDayA = a.subtract(Duration(days: a.weekday - DateTime.monday));
+    final weekDayB = b.subtract(Duration(days: b.weekday - DateTime.monday));
     return _isSameDay(weekDayA, weekDayB);
   }
 

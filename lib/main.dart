@@ -45,7 +45,7 @@ class PetStepsApp extends StatelessWidget {                           // Widget 
     colorSchemeSeed: Colors.indigo,                             // Seed per generare palette Material 3
     useMaterial3: true,                                         // Abilita componenti Material You
     ),
-    home: const HomePage(),                                       // Prima schermata visualizzata
+    home: const HomePage(),
     ),
     );
     }

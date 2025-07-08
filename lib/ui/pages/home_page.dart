@@ -35,39 +35,39 @@ class _HomePageState extends State<HomePage> {
   bool? _wasHappy;
 
   static const List<String> happyNotHungryPhrases = [
-    'Oggi mi sento alla grande!',
-    'Che bella giornata!',
-    'Sono pronto per nuove avventure!',
-    'Mi sento sazio e felice!',
-    'Grazie per prenderti cura di me!'
+    'Today I am feeling great!',
+    'What a beautiful day!',
+    'Ready for new adventures!',
+    'I am full and happy!',
+    'Thanks for taking care of me!'
   ];
 
   static const List<String> happyHungryPhrases = [
-    'Sto iniziando ad avere fame...',
-    'Un piccolo spuntino sarebbe perfetto!',
-    'Potrei sgranocchiare qualcosa.',
-    'Che profumino! Hai qualcosa da mangiare?',
-    'Ho un languorino...'
+    'Starting to be hungry...',
+    'A snack should be cool!',
+    'I could eat something.',
+    'Have you something to eat?',
   ];
 
   static const List<String> sadNotHungryPhrases = [
-    'Non mi sento molto allegro...',
-    "Mi annoio un po'.",
-    "Avrei bisogno di un po' di compagnia.",
-    'Sigh... che giornata triste.',
-    'Potresti giocare con me?'
+    'I am not feeling so happy...',
+    "I'm a little bored.",
+    "I reaaly need to stay together .",
+    'Sigh... what a sad day.',
+    'Can you play with me?'
   ];
 
   static const List<String> sadHungryPhrases = [
-    'Ho fame e mi sento giù...',
-    'Mi brontola lo stomaco e sono triste.',
-    'Per favore, dammi qualcosa da mangiare...',
-    'Sono affamato e infelice.',
-    'Niente cibo e niente felicità...'
+    "I'm hungry and I'm feeling upset...",
+    'my stomach is growling and I feel alone...',
+    'Please, can you give me something to eat?',
+    '😞😞...',
+    'No food and no happyness today...'
   ];
 
   String _currentPhrase = '';
   Timer? _phraseTimer;
+  Timer? _eggCheckTimer;
   static const String eggPhrase =
       "Wonder what's inside? It needs more time, and more steps!";
 
@@ -77,6 +77,12 @@ class _HomePageState extends State<HomePage> {
     _pet = Provider.of<Pet>(context, listen: false);
     _pet.addListener(_handlePetChange);
     _initAsync();
+    _eggCheckTimer =
+        Timer.periodic(const Duration(seconds: 5), (_) {
+          if (!_pet.isEgg && _currentPhrase == eggPhrase) {
+            _changePhrase();
+          }
+        });
   }
 
   Future<void> _initAsync() async {
@@ -114,6 +120,7 @@ class _HomePageState extends State<HomePage> {
   void _updatePhrase() {
     if (_pet.isEgg) {
       _phraseTimer?.cancel();
+      _phraseTimer = null;
       if (_currentPhrase != eggPhrase) {
         setState(() => _currentPhrase = eggPhrase);
       }
@@ -175,6 +182,7 @@ class _HomePageState extends State<HomePage> {
   void dispose() {
     _mockStepTimer?.cancel();
     _phraseTimer?.cancel();
+    _eggCheckTimer?.cancel();
     _pet.removeListener(_handlePetChange);
     super.dispose();
   }
@@ -203,11 +211,11 @@ class _HomePageState extends State<HomePage> {
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: const [
-                  Text('🎉 Evoluzione!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                  Text('🎉 Hatching!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                   SizedBox(height: 16),
-                  Text('Il tuo pet si è schiuso! Controlla la pagina delle statistiche.', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                  Text('Your egg is hatched! Check the stats page.', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
                   SizedBox(height: 12),
-                  Text('Prenditene cura e fallo crescere! 🐒', textAlign: TextAlign.center),
+                  Text('Take care of your pet and grow him up! 🐒', textAlign: TextAlign.center),
                 ],
               ),
             ),
@@ -237,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 16),
                 Text('Your pet has evolved!', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
                 SizedBox(height: 12),
-                Text('You are applying so much effort to take care of him! 🐒', textAlign: TextAlign.center),
+                Text('You are on the right way, keep taking care of him! 🐒', textAlign: TextAlign.center),
               ],
             ),
           ),
@@ -373,13 +381,13 @@ class _HomePageState extends State<HomePage> {
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
                                   _StatBar(
-                                    label: 'Fame',
+                                    label: 'Hunger',
                                     value: pet.hunger,
                                     icon: Icons.restaurant,
                                   ),
                                   const SizedBox(height: 8),
                                   _StatBar(
-                                    label: 'Felicità',
+                                    label: 'Happiness',
                                     value: pet.happiness,
                                     icon: Icons.emoji_emotions,
                                   ),
@@ -407,13 +415,12 @@ class _HomePageState extends State<HomePage> {
                     child: Text(
                       _currentPhrase,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(fontStyle: FontStyle.italic),
                     ),
                   ),
                   const SizedBox(height: 24),
 
                   // livello & passi
-                  Text('Livello ${pet.level}',
+                  Text('Level ${pet.level}',
                       style: Theme.of(context).textTheme.titleLarge!.copyWith(
                         color: isDayTime
                             ? Colors.black
@@ -431,7 +438,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  Text('Passi oggi: ${stepsManager.dailySteps}',
+                  Text('steps today: ${stepsManager.dailySteps}',
                       style: TextStyle(
                         color: isDayTime
                             ? Colors.black
@@ -455,11 +462,11 @@ class _HomePageState extends State<HomePage> {
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: const [
-                                  Text('Aspetta che il tuo pet si schiuda prima di dargli da mangiare!',
+                                  Text('Your egg could not eat yet! Walk more and try to hatch it.',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                                   SizedBox(height: 12),
-                                  Text('La schiusura dell\'uovo accadrà quando avrai raggiunto il livello 1',
+                                  Text('Your egg will hatch when it reach the level 1.',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(fontSize: 16)),
                                 ],
@@ -629,7 +636,7 @@ class _AppDrawer extends StatelessWidget {
               children: [
                 Text('Pet Steps', style: TextStyle(fontSize: 24)),
                 SizedBox(height: 8),
-                Text('Ciao, allenati!'),
+                Text('Is time to walk together!'),
               ],
             ),
           ),
