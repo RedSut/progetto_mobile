@@ -73,17 +73,19 @@ class Pet extends ChangeNotifier {
   }
 
   void _decreaseHunger(int minutes) {
-    hunger = (hunger - minutes).clamp(0, 100);
+    int value = (minutes/5).round(); // scende di 12 ogni ora
+    hunger = (hunger - value).clamp(0, 100);
     _updateHappinessTimer();
   }
 
   void _decreaseHappiness(int minutes) {
-    happiness = (happiness - (minutes / 2).round()).clamp(0, 100);
+    int value = (minutes/10).round(); // scende di 6 ogni ora
+    happiness = (happiness - value).clamp(0, 100);
   }
 
   void _updateHappinessTimer() {
     if (hunger < 50) {
-      _happinessTimer ??= Timer.periodic(const Duration(seconds: 1), (_) {
+      _happinessTimer ??= Timer.periodic(const Duration(seconds: 30), (_) {
         if (hunger < 50) {
           happiness = (happiness - 1).clamp(0, 100);
           savePet();
@@ -96,10 +98,12 @@ class Pet extends ChangeNotifier {
     }
   }
 
-  void applySteps(int steps) {
+  Future<void> applySteps(int steps) async {
     if (!isEgg){
-      hunger = (hunger - (steps * 2)).clamp(0, 100);
-      happiness = (happiness + steps).clamp(0, 100);
+      var dailyGoal = await StorageService.getDailyGoal();
+      int value = (dailyGoal/200).round(); // numero di passi che servono per far calare di 1 la fame e aumentare di 0.5 la felicità
+      hunger = (hunger - (steps/value).round()).clamp(0, 100);
+      happiness = (happiness + (steps/value*2).round()).clamp(0, 100);
       _updateHappinessTimer();
     }
     lastUpdated = DateTime.now();
