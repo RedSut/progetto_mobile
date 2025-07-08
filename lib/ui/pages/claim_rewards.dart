@@ -280,7 +280,7 @@ class _RewardsPageState extends State<RewardsPage> {
                       ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                       content: Text(
-                      'Hai ricevuto ${challenge.reward.quantity}x ${challenge.reward.item.name}!',
+                      'You received ${challenge.reward.quantity}x ${challenge.reward.item.name}!',
                       ),
                       behavior: SnackBarBehavior.floating,
                       backgroundColor: Colors.green.shade600,

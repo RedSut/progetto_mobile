@@ -19,7 +19,7 @@ class BagPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.green.shade900,
         appBar: AppBar(
-          title: const Text('La tua Borsa', style: TextStyle(color: Colors.white),),
+          title: const Text('Your Bag', style: TextStyle(color: Colors.white),),
           backgroundColor: Colors.green.shade900,
           elevation: 0,
           foregroundColor: Colors.white,
@@ -41,10 +41,10 @@ class BagPage extends StatelessWidget {
               child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: const [
-                    Text('La tua borsa è vuota!',
+                    Text('Your bag is empty!',
                       style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
                     SizedBox(height: 16),
-                    Text('Prova a completare quanche challenge o ritirare le ricompense di quelle già completate',
+                    Text('Try completing a few challenges or collecting rewards from the ones you\'ve already finished.',
                         textAlign: TextAlign.center,
                         style: TextStyle(color: Colors.white, fontSize: 20, fontStyle: FontStyle.italic)),
                   ]
@@ -64,19 +64,21 @@ class BagPage extends StatelessWidget {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: Text(item.name),
+                        title: Text(item.name, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+                        backgroundColor: Colors.green.shade800,
                         content: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Image.asset(item.imagePath, width: 80, height: 80),
                             const SizedBox(height: 8),
-                            Text(item.description),
+                            Text(item.description, style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic),),
                           ],
                         ),
                         actions: [
                           TextButton(
+                            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white),),
                             onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Close'),
+                            child: const Text('Close', style: TextStyle(color: Colors.black)),
                           ),
                         ],
                       ),

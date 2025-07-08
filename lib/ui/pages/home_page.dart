@@ -422,12 +422,12 @@ class _HomePageState extends State<HomePage> {
 
                   // livello & passi
                   Text('Level ${pet.level}',
-                      style: Theme.of(context).textTheme.titleLarge!.copyWith(
-                        color: isDayTime
-                            ? Colors.black
-                            : Colors.white,
-                      )
+                    style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    )
                   ),
+                  const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 4),
                     child: LinearProgressIndicator(
@@ -438,15 +438,15 @@ class _HomePageState extends State<HomePage> {
                       const AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 10),
                   Text('steps today: ${stepsManager.dailySteps}',
-                      style: TextStyle(
-                        color: isDayTime
-                            ? Colors.black
-                            : Colors.white,
-                      )
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-
+                  const SizedBox(height: 20),
                   // pulsanti feed / rewards
                   AnimatedScale(
                     scale: _feedButtonScaling ? 1.1 : 1.0,
@@ -519,7 +519,7 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(22),
                         ),
                         backgroundColor: Colors.orange.shade100,
-                        foregroundColor: Colors.orange,
+                        foregroundColor: Colors.black,
                         side: const BorderSide(color: Colors.orange),
                       ),
                       child: const Text('Claim rewards'),
