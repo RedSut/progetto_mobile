@@ -199,7 +199,7 @@ class _FeedPageState extends State<FeedPage> {
                         ? const Center(
                           child: Column(
                             mainAxisSize: MainAxisSize.min,
-                            children: const [
+                            children: [
                               Text('La tua borsa è vuota!',
                                 style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
                               SizedBox(height: 16),
