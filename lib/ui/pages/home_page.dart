@@ -14,6 +14,7 @@ import 'bag_page.dart';
 import 'claim_rewards.dart';
 import 'stats_page.dart';
 import 'feed_page.dart';
+import 'game_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -286,7 +287,28 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pet Steps'),
-        backgroundColor: Colors.orange.shade200,),
+        backgroundColor: Colors.orange.shade200,
+        actions: [
+          TextButton(
+            onPressed: () {
+              final pet = context.read<Pet>();
+              if (pet.isEgg) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Your egg cannot play games. Try to hatch it!'),
+                  ),
+                );
+              } else {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const GamePage()),
+                );
+              }
+            },
+            child: const Text('Play with pet'),
+          ),
+        ],
+      ),
       drawer: const _AppDrawer(),
       drawerEdgeDragWidth: 30.0,
 

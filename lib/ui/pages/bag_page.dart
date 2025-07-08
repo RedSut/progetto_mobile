@@ -38,26 +38,38 @@ class BagPage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: bag.items.isEmpty
                 ? const Center(
-              child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: const [
-                    Text('Your bag is empty!',
-                      style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),),
-                    SizedBox(height: 16),
-                    Text('Try completing a few challenges or collecting rewards from the ones you\'ve already finished.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white, fontSize: 20, fontStyle: FontStyle.italic)),
-                  ]
-              ),
-            )
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        Text(
+                          'Your bag is empty!',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 16),
+                        Text(
+                          'Try to complete some challenge, or claim the finished ones.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontStyle: FontStyle.italic,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
                 : GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
-              childAspectRatio: 0.8,
-              children: bag.items.entries.map((entry) {
-                final item = entry.key;
-                final quantity = entry.value;
+                    crossAxisCount: 2,
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 0.8,
+                    children: bag.items.entries.map((entry) {
+                      final item = entry.key;
+                      final quantity = entry.value;
 
                 return InkWell(
                   onTap: () {
