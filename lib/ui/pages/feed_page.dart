@@ -289,7 +289,7 @@ class _FeedPageState extends State<FeedPage> {
                                         ).showSnackBar(
                                           SnackBar(
                                             content: Text(
-                                              '${food.name} Given to the pet!',
+                                              '${food.name} given to the pet!',
                                             ),
                                             duration: const Duration(
                                               seconds: 1,
