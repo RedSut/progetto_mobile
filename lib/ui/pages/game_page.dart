@@ -1,0 +1,229 @@
+import 'dart:async';
+import 'dart:math';
+
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:sensors_plus/sensors_plus.dart';
+
+import '../../models/pet.dart';
+
+class _Platform {
+  double x;
+  double y;
+  double width;
+  _Platform(this.x, this.y, [this.width = 60]);
+}
+
+class GamePage extends StatefulWidget {
+  const GamePage({super.key});
+
+  @override
+  State<GamePage> createState() => _GamePageState();
+}
+
+class _GamePageState extends State<GamePage> {
+  static const double _gravity = 0.4;
+  static const double _jumpVelocity = -20;
+  static const double _petSize = 60;
+
+  late double _petX;
+  late double _petY;
+  double _vx = 0;
+  double _vy = 0;
+
+  late List<_Platform> _platforms;
+  int _jumps = 0;
+  StreamSubscription<AccelerometerEvent>? _accelSub;
+  Timer? _timer;
+  bool _started = false;
+  bool _gameOver = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _resetGame();
+  }
+
+  void _resetGame() {
+    final size =
+        WidgetsBinding.instance.window.physicalSize /
+        WidgetsBinding.instance.window.devicePixelRatio;
+    _petX = size.width / 2 - _petSize / 2;
+    // start a little lower than half screen so the camera can follow up
+    _petY = size.height * 0.6 - _petSize / 2;
+    _vx = 0;
+    _vy = 0;
+    final rnd = Random();
+    _platforms = [
+      _Platform(_petX - 20, _petY + _petSize + 5, 100),
+      ...List.generate(
+        4,
+        (i) => _Platform(
+          rnd.nextDouble() * (size.width - 60),
+          size.height - i * (size.height / 5) - 60,
+          60,
+        ),
+      ),
+    ];
+    _jumps = 0;
+    _gameOver = false;
+    _started = false;
+    _timer?.cancel();
+    _accelSub?.cancel();
+  }
+
+  void _startGame() {
+    setState(() => _started = true);
+    _accelSub = accelerometerEvents.listen((event) {
+      _vx = -event.x * 4; // tilt left/right
+    });
+    _timer = Timer.periodic(const Duration(milliseconds: 16), _update);
+  }
+
+  void _update(Timer timer) {
+    final size = MediaQuery.of(context).size;
+    _vy += _gravity;
+    _petX += _vx;
+    _petY += _vy;
+
+    if (_petX < -_petSize) _petX = size.width;
+    if (_petX > size.width) _petX = -_petSize;
+
+    final rnd = Random();
+    for (final p in _platforms) {
+      if (_vy > 0 &&
+          _petY + _petSize >= p.y &&
+          _petY + _petSize <= p.y + 10 &&
+          _petX + _petSize >= p.x &&
+          _petX <= p.x + p.width) {
+        _vy = _jumpVelocity;
+        _jumps++;
+      }
+    }
+
+    // move camera up when the pet climbs higher than 40% of the screen
+    final double followThreshold = size.height * 0.4;
+    if (_petY < followThreshold) {
+      final dy = followThreshold - _petY;
+      _petY = followThreshold;
+      for (final p in _platforms) {
+        p.y += dy;
+      }
+    }
+
+    for (final p in _platforms) {
+      if (p.y > size.height) {
+        p.x = rnd.nextDouble() * (size.width - p.width);
+        p.y -= size.height;
+      }
+    }
+
+    if (_petY > size.height - _petSize) {
+      _petY = size.height - _petSize;
+      _gameOver = true;
+      _timer?.cancel();
+      _accelSub?.cancel();
+    }
+
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _accelSub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final pet = context.watch<Pet>();
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Play'),
+        backgroundColor: Colors.orange.shade200,
+      ),
+      body: Container(
+        color: Colors.lightBlue.shade100,
+        child: Stack(
+          children: [
+            if (!_started && !_gameOver)
+              Center(
+                child: ElevatedButton(
+                  onPressed: _startGame,
+                  child: const Text('Start'),
+                ),
+              ),
+            if (_started || _gameOver) ...[
+              for (final p in _platforms)
+                Positioned(
+                  left: p.x,
+                  top: p.y,
+                  child: Container(
+                    width: p.width,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                ),
+              Positioned(
+                left: _petX,
+                top: _petY,
+                child: Image.asset(
+                  pet.imagePath,
+                  width: _petSize,
+                  height: _petSize,
+                ),
+              ),
+              Positioned(
+                top: 16,
+                right: 16,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.black54,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    'Jumps: $_jumps',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+            if (_gameOver)
+              Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Game Over',
+                      style: TextStyle(fontSize: 32, color: Colors.red),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: () {
+                        _resetGame();
+                        _startGame();
+                        setState(() {});
+                      },
+                      child: const Text('Restart'),
+                    ),
+                  ],
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

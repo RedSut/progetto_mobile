@@ -4,8 +4,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/pet.dart';
 import '../../models/bag.dart';
+import '../../models/pet.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
@@ -19,21 +19,20 @@ class FeedPage extends StatefulWidget {
     'strawberry': 10,
   };
 
-
   static const List<String> veryHungryPhrases = [
-    'Sto morendo di fame...',
-    'Mi sento debole, ho bisogno di cibo!',
-    'Per favore, fammi mangiare presto!',
-    'Ho il vuoto nello stomaco!',
-    'Non resisto più dalla fame!'
+    'I\'m starving...',
+    'I feel weak, I need food!',
+    'Please, let me eat soon!',
+    'I have an empty feeling in my stomach!',
+    'I can\'t take the hunger anymore!',
   ];
 
   static const List<String> normalHungryPhrases = [
-    'Potrei mangiare qualcosina.',
-    'Un altro boccone non sarebbe male.',
-    'Non ho molta fame, ma potrei assaggiare qualcosa.',
-    'Sono abbastanza sazio, grazie!',
-    'Forse più tardi avrò fame.'
+    'I could eat a little something.',
+    'Another bite wouldn’t be bad.',
+    'I’m not very hungry, but I could try something.',
+    'I’m quite full, thanks!',
+    'Maybe I’ll be hungry later.',
   ];
 
   @override
@@ -88,8 +87,10 @@ class _FeedPageState extends State<FeedPage> {
     final isDayTime = hour >= 6 && hour < 18;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Feed'),
-        backgroundColor: Colors.blue.shade200,),
+      appBar: AppBar(
+        title: const Text('Feed'),
+        backgroundColor: Colors.blue.shade200,
+      ),
       body: Stack(
         fit: StackFit.expand,
         children: [
@@ -99,16 +100,16 @@ class _FeedPageState extends State<FeedPage> {
                 : 'assets/imageCucciaNight.png',
             fit: BoxFit.cover,
           ),
-          Container(
-            color: Colors.black.withOpacity(0.2),
-          ),
+          Container(color: Colors.black.withOpacity(0.2)),
           Column(
             children: [
               const SizedBox(height: 24),
-              Text('Fame: ${pet.hunger}/100',
-                  style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Colors.white,
-                  ),),
+              Text(
+                'Hunger: ${pet.hunger}/100',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium!.copyWith(color: Colors.white),
+              ),
               const SizedBox(height: 16),
               LinearProgressIndicator(
                 value: pet.hunger / 100,
@@ -118,51 +119,59 @@ class _FeedPageState extends State<FeedPage> {
               const SizedBox(height: 24),
               Column(
                 children: [
-                Stack(
-                alignment: Alignment.center,
-                children: [
-                  Image.asset(
-                    pet.imagePath,
-                    width: 240,
-                    height: 240,
+                  Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      Image.asset(pet.imagePath, width: 240, height: 240),
+                      if (_showStars) ...[
+                        Positioned(
+                          top: 10,
+                          left: 50,
+                          child: AnimatedOpacity(
+                            opacity: _showStars ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: const Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 32,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 20,
+                          right: 40,
+                          child: AnimatedOpacity(
+                            opacity: _showStars ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: const Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 28,
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 40,
+                          left: 60,
+                          child: AnimatedOpacity(
+                            opacity: _showStars ? 1.0 : 0.0,
+                            duration: const Duration(milliseconds: 300),
+                            child: const Icon(
+                              Icons.star,
+                              color: Colors.yellow,
+                              size: 24,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
-                  if (_showStars) ...[
-                    Positioned(
-                      top: 10,
-                      left: 50,
-                      child: AnimatedOpacity(
-                        opacity: _showStars ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 300),
-                        child: const Icon(Icons.star,
-                            color: Colors.yellow, size: 32),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 20,
-                      right: 40,
-                      child: AnimatedOpacity(
-                        opacity: _showStars ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 300),
-                        child: const Icon(Icons.star,
-                            color: Colors.yellow, size: 28),
-                      ),
-                    ),
-                    Positioned(
-                      bottom: 40,
-                      left: 60,
-                      child: AnimatedOpacity(
-                        opacity: _showStars ? 1.0 : 0.0,
-                        duration: const Duration(milliseconds: 300),
-                        child: const Icon(Icons.star,
-                            color: Colors.yellow, size: 24),
-                      ),
-                    ),
-                  ],
-                ],
-                ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -184,7 +193,7 @@ class _FeedPageState extends State<FeedPage> {
               ),
               const SizedBox(height: 24),
               Expanded(
-                child : Container(
+                child: Container(
                   decoration: BoxDecoration(
                     color: Colors.blue.shade200,
                     borderRadius: const BorderRadius.only(
@@ -196,105 +205,141 @@ class _FeedPageState extends State<FeedPage> {
                     builder: (context, bag, _) {
                       final entries = bag.items.entries.toList();
                       return bag.items.isEmpty
-                        ? const Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text('La tua borsa è vuota!',
-                                style: TextStyle(color: Colors.black, fontSize: 20, fontWeight: FontWeight.bold),),
-                              SizedBox(height: 16),
-                              Text('Prova a completare quanche challenge o ritirare le ricompense di quelle già completate',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.black, fontSize: 20, fontStyle: FontStyle.italic)),
-                            ]
-                          ),
-                        ) : GridView.builder(
-                        padding: const EdgeInsets.all(16),
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 3,
-                          mainAxisSpacing: 16,
-                          crossAxisSpacing: 16,
-                        ),
-                        itemCount: entries.length,
-                        itemBuilder: (context, index) {
-                          final entry = entries[index];
-                          final food = entry.key;
-                          final quantity = entry.value;
-                          final isScaling = _scalingItems.contains(index);
-                          return AnimatedScale(
-                            scale: isScaling ? 1.1 : 1.0,
-                            duration: const Duration(milliseconds: 200),
-                            child: GestureDetector(
-                              onTap: () {
-                                final pet = context.read<Pet>();
-                                if (pet.hunger >= 100) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('Il tuo pet è già sazio!'),
-                                      duration: Duration(seconds: 1),
-                                    ),
-                                  );
-                                  return;
-                                }
-
-                                final bag = context.read<Bag>();
-                                if (bag.removeItem(food, 1)) {
-                                  final value =
-                                      FeedPage.feedValues[food.name] ?? food.feedValue;
-                                  pet.feed(value);
-                                  _changePhrase();
-                                  _triggerStarAnimation();
-                                  setState(() {
-                                    _scalingItems.add(index);
-                                  });
-                                  Future.delayed(const Duration(milliseconds: 200), () {
-                                    if (!mounted) return;
-                                    setState(() {
-                                      _scalingItems.remove(index);
-                                    });
-                                  });
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('${food.name} dato al pet!'),
-                                      duration: const Duration(seconds: 1),
-                                    ),
-                                  );
-                                }
-                              },
+                          ? const Center(
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Stack(
-                                    alignment: Alignment.topRight,
-                                    children: [
-                                      Image.asset(food.imagePath, width: 64, height: 64),
-                                      Container(
-                                        padding: const EdgeInsets.all(2),
-                                        decoration: BoxDecoration(
-                                          color: Colors.black54,
-                                          borderRadius: BorderRadius.circular(8),
+                                mainAxisSize: MainAxisSize.min,
+                                children: const [
+                                  Text(
+                                    'Your bag is empty!',
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 16),
+                                  Text(
+                                    'Try to complete some challenge, or claim the finished ones.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 20,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : GridView.builder(
+                              padding: const EdgeInsets.all(16),
+                              gridDelegate:
+                                  const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    mainAxisSpacing: 16,
+                                    crossAxisSpacing: 16,
+                                  ),
+                              itemCount: entries.length,
+                              itemBuilder: (context, index) {
+                                final entry = entries[index];
+                                final food = entry.key;
+                                final quantity = entry.value;
+                                final isScaling = _scalingItems.contains(index);
+                                return AnimatedScale(
+                                  scale: isScaling ? 1.1 : 1.0,
+                                  duration: const Duration(milliseconds: 200),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      final pet = context.read<Pet>();
+                                      if (pet.hunger >= 100) {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Your pet is already ok!',
+                                            ),
+                                            duration: Duration(seconds: 1),
+                                          ),
+                                        );
+                                        return;
+                                      }
+
+                                      final bag = context.read<Bag>();
+                                      if (bag.removeItem(food, 1)) {
+                                        final value =
+                                            FeedPage.feedValues[food.name] ??
+                                            food.feedValue;
+                                        pet.feed(value);
+                                        _changePhrase();
+                                        _triggerStarAnimation();
+                                        setState(() {
+                                          _scalingItems.add(index);
+                                        });
+                                        Future.delayed(
+                                          const Duration(milliseconds: 200),
+                                          () {
+                                            if (!mounted) return;
+                                            setState(() {
+                                              _scalingItems.remove(index);
+                                            });
+                                          },
+                                        );
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              '${food.name} Given to the pet!',
+                                            ),
+                                            duration: const Duration(
+                                              seconds: 1,
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Stack(
+                                          alignment: Alignment.topRight,
+                                          children: [
+                                            Image.asset(
+                                              food.imagePath,
+                                              width: 64,
+                                              height: 64,
+                                            ),
+                                            Container(
+                                              padding: const EdgeInsets.all(2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black54,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
+                                                'x$quantity',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                        child: Text(
-                                          'x$quantity',
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          food.name,
                                           style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
                                   ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  food.name,
-                                  style: const TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ],
-                              ),
-                            ),
-                          );
-                        },
-                      );
+                                );
+                              },
+                            );
                     },
                   ),
                 ),
