@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'item.dart';
@@ -87,7 +88,8 @@ class StorageService {
 
   static Future<DateTime> getPetLastUpdated() async {
     final prefs = await _prefs;
-    return DateTime.tryParse(prefs.getString('lastUpdated') ?? '') ?? DateTime.now();
+    return DateTime.tryParse(prefs.getString('lastUpdated') ?? '') ??
+        DateTime.now();
   }
 
   static Future<void> savePetHunger(int fame) async {
@@ -147,11 +149,22 @@ class StorageService {
     return prefs.getInt('totalSteps') ?? 0;
   }
 
+  // 📌 Salva il punteggio massimo del gioco
+  static Future<void> saveHighScore(int score) async {
+    final prefs = await _prefs;
+    prefs.setInt('highScore', score);
+  }
+
+  static Future<int> getHighScore() async {
+    final prefs = await _prefs;
+    return prefs.getInt('highScore') ?? 0;
+  }
+
   // 📌 Salva il contenuto della bag
   static Future<void> saveBag(Map<Item, int> bag) async {
     final prefs = await _prefs;
     final Map<String, int> bagToSave = {
-      for (var entry in bag.entries) entry.key.id: entry.value
+      for (var entry in bag.entries) entry.key.id: entry.value,
     };
     prefs.setString('bag', jsonEncode(bagToSave));
   }
@@ -165,7 +178,7 @@ class StorageService {
 
       for (var entry in decoded.entries) {
         final item = ItemManager().items.firstWhere(
-              (element) => element.id == entry.key,
+          (element) => element.id == entry.key,
           orElse: () => Item(
             id: 'unknown',
             name: 'Sconosciuto',
@@ -209,7 +222,9 @@ class StorageService {
   static Future<DateTime> getLastDailyReset() async {
     final prefs = await _prefs;
     final stored = prefs.getString('lastDailyReset');
-    return stored != null ? DateTime.tryParse(stored) ?? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(0);
+    return stored != null
+        ? DateTime.tryParse(stored) ?? DateTime.now()
+        : DateTime.fromMillisecondsSinceEpoch(0);
   }
 
   // Salva l'ultima data di reset settimanale
@@ -221,7 +236,9 @@ class StorageService {
   static Future<DateTime> getLastWeeklyReset() async {
     final prefs = await _prefs;
     final stored = prefs.getString('lastWeeklyReset');
-    return stored != null ? DateTime.tryParse(stored) ?? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(0);
+    return stored != null
+        ? DateTime.tryParse(stored) ?? DateTime.now()
+        : DateTime.fromMillisecondsSinceEpoch(0);
   }
 
   // Salva l'ultima data di reset orario
@@ -233,7 +250,9 @@ class StorageService {
   static Future<DateTime> getLastHourlyReset() async {
     final prefs = await _prefs;
     final stored = prefs.getString('lastHourlyReset');
-    return stored != null ? DateTime.tryParse(stored) ?? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(0);
+    return stored != null
+        ? DateTime.tryParse(stored) ?? DateTime.now()
+        : DateTime.fromMillisecondsSinceEpoch(0);
   }
 
   // Salva l'ultima data di reset al minuto
@@ -245,7 +264,9 @@ class StorageService {
   static Future<DateTime> getLastMinuteReset() async {
     final prefs = await _prefs;
     final stored = prefs.getString('lastMinuteReset');
-    return stored != null ? DateTime.tryParse(stored) ?? DateTime.now() : DateTime.fromMillisecondsSinceEpoch(0);
+    return stored != null
+        ? DateTime.tryParse(stored) ?? DateTime.now()
+        : DateTime.fromMillisecondsSinceEpoch(0);
   }
 
   // 📌 Salva il dayly goal

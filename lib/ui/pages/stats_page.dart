@@ -1,10 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 import 'package:progetto_mobile/models/pet.dart';
-import 'dart:math';
 import 'package:provider/provider.dart';
 
 import '../../models/steps.dart'; // importa la tua classe StepsManager
+import '../../models/storage_service.dart';
 
 class StatsPage extends StatefulWidget {
   const StatsPage({super.key});
@@ -20,23 +22,36 @@ class _StatsPageState extends State<StatsPage> {
     "Every step count!",
     "Your pet is proud of you!",
     "You are in the right way!",
-    "Great, don't stop!"
+    "Great, don't stop!",
   ];
 
   late String currentPhrase;
+  int _highScore = 0;
 
   @override
   void initState() {
     super.initState();
     _generateRandomPhrase();
+    _loadHighScore();
+  }
+
+  Future<void> _loadHighScore() async {
+    _highScore = await StorageService.getHighScore();
+    setState(() {});
   }
 
   void _generateRandomPhrase() {
     final random = Random();
-    currentPhrase = motivationalPhrases[random.nextInt(motivationalPhrases.length)];
+    currentPhrase =
+        motivationalPhrases[random.nextInt(motivationalPhrases.length)];
   }
 
-  Widget _buildStatItem(String label, int steps, {int? goal, bool showArc = true}) {
+  Widget _buildStatItem(
+    String label,
+    int steps, {
+    int? goal,
+    bool showArc = true,
+  }) {
     double progress = 0;
     if (goal != null && goal > 0) {
       progress = (steps / goal).clamp(0.0, 1.0);
@@ -47,7 +62,10 @@ class _StatsPageState extends State<StatsPage> {
         Text(
           label,
           style: const TextStyle(
-              fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
         const SizedBox(height: 12),
         if (showArc)
@@ -92,7 +110,6 @@ class _StatsPageState extends State<StatsPage> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     // Prendo l'istanza aggiornata di StepsManager da Provider
@@ -102,8 +119,10 @@ class _StatsPageState extends State<StatsPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF688D92),
       appBar: AppBar(
-        title:
-        const Text("Stats", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text(
+          "Stats",
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         backgroundColor: const Color(0xFF688D92),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -124,9 +143,10 @@ class _StatsPageState extends State<StatsPage> {
                 const Text(
                   'Knowed evolution of pet:',
                   style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 Row(
@@ -147,42 +167,67 @@ class _StatsPageState extends State<StatsPage> {
                   ],
                 ),
                 const SizedBox(height: 40),
-                _buildStatItem("Daily steps to the goal:", (stepsManager.dailyGoal - stepsManager.dailySteps).clamp(0, stepsManager.dailyGoal),
-                    goal: stepsManager.dailyGoal),
-                 SizedBox(height: 40),
-                _buildStatItem("Weekly steps to the goal:", (stepsManager.weeklyGoal - stepsManager.weeklySteps).clamp(0, stepsManager.weeklyGoal),
-                    goal: stepsManager.weeklyGoal),
+                _buildStatItem(
+                  "Daily steps to the goal:",
+                  (stepsManager.dailyGoal - stepsManager.dailySteps).clamp(
+                    0,
+                    stepsManager.dailyGoal,
+                  ),
+                  goal: stepsManager.dailyGoal,
+                ),
+                SizedBox(height: 40),
+                _buildStatItem(
+                  "Weekly steps to the goal:",
+                  (stepsManager.weeklyGoal - stepsManager.weeklySteps).clamp(
+                    0,
+                    stepsManager.weeklyGoal,
+                  ),
+                  goal: stepsManager.weeklyGoal,
+                ),
                 const SizedBox(height: 40),
-                _buildStatItem("Lifetime steps", stepsManager.lifetimeSteps,
-                    showArc: false),
+                _buildStatItem(
+                  "Lifetime steps",
+                  stepsManager.lifetimeSteps,
+                  showArc: false,
+                ),
+                const SizedBox(height: 12),
+                RichText(
+                  text: TextSpan(
+                    style: const TextStyle(fontSize: 22, color: Colors.white),
+                    children: [
+                      const TextSpan(
+                        text: 'High score in the game: ',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      TextSpan(text: '$_highScore'),
+                    ],
+                  ),
+                ),
                 const SizedBox(height: 40),
               ],
             ),
           ),
         ),
-      ),bottomNavigationBar: SafeArea(
+      ),
+      bottomNavigationBar: SafeArea(
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           color: const Color(0xFF688D92),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-            Image.asset(
-            pet.imagePath,
-            width: 60,
-            height: 60,
-          ),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Text(
-                currentPhrase,
-                style: const TextStyle(fontSize: 16),
+              Image.asset(pet.imagePath, width: 60, height: 60),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Text(
+                    currentPhrase,
+                    style: const TextStyle(fontSize: 16),
                   ),
                 ),
               ),
@@ -193,4 +238,3 @@ class _StatsPageState extends State<StatsPage> {
     );
   }
 }
-

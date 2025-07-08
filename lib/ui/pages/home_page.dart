@@ -1,20 +1,21 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';            // kDebugMode
+import 'dart:math';
+
+import 'package:flutter/foundation.dart'; // kDebugMode
 import 'package:flutter/material.dart';
 import 'package:progetto_mobile/models/challenge.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
 import 'package:progetto_mobile/ui/pages/settings_page.dart';
 import 'package:provider/provider.dart';
-import 'dart:math';
 
 import '../../models/bag.dart';
 import '../../models/pet.dart';
 import '../../models/steps.dart';
 import 'bag_page.dart';
 import 'claim_rewards.dart';
-import 'stats_page.dart';
 import 'feed_page.dart';
 import 'game_page.dart';
+import 'stats_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -27,9 +28,10 @@ class _HomePageState extends State<HomePage> {
   bool _showStats = false;
   bool _feedButtonScaling = false;
   bool _rewardsButtonScaling = false;
+  bool _playButtonScaling = false;
   Timer? _mockStepTimer;
-  int _previousLevel = -1;                          // livello precedente; -1 se non caricato
-  int _previousStage = -1;                          // evoluzione precedente
+  int _previousLevel = -1; // livello precedente; -1 se non caricato
+  int _previousStage = -1; // evoluzione precedente
   bool _hatchDialogShown = false;
   late final Pet _pet;
   bool? _wasHungry;
@@ -40,7 +42,7 @@ class _HomePageState extends State<HomePage> {
     'What a beautiful day!',
     'Ready for new adventures!',
     'I am full and happy!',
-    'Thanks for taking care of me!'
+    'Thanks for taking care of me!',
   ];
 
   static const List<String> happyHungryPhrases = [
@@ -55,7 +57,7 @@ class _HomePageState extends State<HomePage> {
     "I'm a little bored.",
     "I reaaly need to stay together .",
     'Sigh... what a sad day.',
-    'Can you play with me?'
+    'Can you play with me?',
   ];
 
   static const List<String> sadHungryPhrases = [
@@ -63,7 +65,7 @@ class _HomePageState extends State<HomePage> {
     'my stomach is growling and I feel alone...',
     'Please, can you give me something to eat?',
     '😞😞...',
-    'No food and no happyness today...'
+    'No food and no happyness today...',
   ];
 
   String _currentPhrase = '';
@@ -78,12 +80,11 @@ class _HomePageState extends State<HomePage> {
     _pet = Provider.of<Pet>(context, listen: false);
     _pet.addListener(_handlePetChange);
     _initAsync();
-    _eggCheckTimer =
-        Timer.periodic(const Duration(seconds: 5), (_) {
-          if (!_pet.isEgg && _currentPhrase == eggPhrase) {
-            _changePhrase();
-          }
-        });
+    _eggCheckTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      if (!_pet.isEgg && _currentPhrase == eggPhrase) {
+        _changePhrase();
+      }
+    });
   }
 
   Future<void> _initAsync() async {
@@ -91,7 +92,10 @@ class _HomePageState extends State<HomePage> {
     await stepsManager.loadSteps();
     await stepsManager.loadGoals();
 
-    final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
+    final challengeManager = Provider.of<ChallengeManager>(
+      context,
+      listen: false,
+    );
     await challengeManager.loadClaimedStatuses();
 
     final bag = Provider.of<Bag>(context, listen: false);
@@ -135,10 +139,10 @@ class _HomePageState extends State<HomePage> {
         final isHappy = _pet.happiness >= 50;
         final shouldUpdate =
             _currentPhrase == eggPhrase ||
-                _wasHungry == null ||
-                isHungry != _wasHungry ||
-                isHappy != _wasHappy ||
-                _phraseTimer == null;
+            _wasHungry == null ||
+            isHungry != _wasHungry ||
+            isHappy != _wasHappy ||
+            _phraseTimer == null;
 
         if (shouldUpdate) {
           _changePhrase();
@@ -190,7 +194,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final pet          = context.watch<Pet>();
+    final pet = context.watch<Pet>();
     final stepsManager = context.watch<StepsManager>();
 
     // Calcolo dell'orario per l'immagine di sfondo, se tra le 6 e le 18 → giorno, altrimenti notte
@@ -198,36 +202,47 @@ class _HomePageState extends State<HomePage> {
     final isDayTime = hour >= 6 && hour < 18;
 
     // ─── Messaggio quando il pet passa da livello 0 a 1 ───
-      if (!_hatchDialogShown &&
-          _previousLevel != -1 &&
-          _previousLevel == 0 &&
-          pet.level == 1) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          showDialog(
-            context: context,
-            barrierDismissible: true,
-            builder: (_) => AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              contentPadding: const EdgeInsets.all(24),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Text('🎉 Hatching!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 16),
-                  Text('Your egg is hatched! Check the stats page.', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
-                  SizedBox(height: 12),
-                  Text('Take care of your pet and grow him up! 🐒', textAlign: TextAlign.center),
-                ],
-              ),
+    if (!_hatchDialogShown &&
+        _previousLevel != -1 &&
+        _previousLevel == 0 &&
+        pet.level == 1) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
             ),
-
-          ).then((_) {
+            contentPadding: const EdgeInsets.all(24),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  '🎉 Hatching!',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  'Your egg is hatched! Check the stats page.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18),
+                ),
+                SizedBox(height: 12),
+                Text(
+                  'Take care of your pet and grow him up! 🐒',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        ).then((_) {
           _hatchDialogShown = true;
           StorageService.saveHatchShown(true);
           _changePhrase();
-          });
         });
-      }
+      });
+    }
 
     // ─── Evoluzione a Mostro1 (livello 25) ───
     if (_previousStage != -1 &&
@@ -238,16 +253,28 @@ class _HomePageState extends State<HomePage> {
           context: context,
           barrierDismissible: true,
           builder: (_) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             contentPadding: const EdgeInsets.all(24),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: const [
-                Text('🎉 Evolution!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                Text(
+                  '🎉 Evolution!',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 SizedBox(height: 16),
-                Text('Your pet has evolved!', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                Text(
+                  'Your pet has evolved!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18),
+                ),
                 SizedBox(height: 12),
-                Text('You are on the right way, keep taking care of him! 🐒', textAlign: TextAlign.center),
+                Text(
+                  'You are on the right way, keep taking care of him! 🐒',
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ),
@@ -264,16 +291,28 @@ class _HomePageState extends State<HomePage> {
           context: context,
           barrierDismissible: true,
           builder: (_) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             contentPadding: const EdgeInsets.all(24),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: const [
-                Text('🎉 Evolution!', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                Text(
+                  '🎉 Evolution!',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
                 SizedBox(height: 16),
-                Text('Your pet has evolved!', textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                Text(
+                  'Your pet has evolved!',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18),
+                ),
                 SizedBox(height: 12),
-                Text('You are applying so much effort to take care of him! 🐒', textAlign: TextAlign.center),
+                Text(
+                  'You are applying so much effort to take care of him! 🐒',
+                  textAlign: TextAlign.center,
+                ),
               ],
             ),
           ),
@@ -288,26 +327,6 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('Pet Steps'),
         backgroundColor: Colors.orange.shade200,
-        actions: [
-          TextButton(
-            onPressed: () {
-              final pet = context.read<Pet>();
-              if (pet.isEgg) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Your egg cannot play games. Try to hatch it!'),
-                  ),
-                );
-              } else {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const GamePage()),
-                );
-              }
-            },
-            child: const Text('Play with pet'),
-          ),
-        ],
       ),
       drawer: const _AppDrawer(),
       drawerEdgeDragWidth: 30.0,
@@ -318,11 +337,14 @@ class _HomePageState extends State<HomePage> {
           if (details.primaryVelocity! < -300) {
             showModalBottomSheet(
               context: context,
-              isScrollControlled: true,   // per farla full screen
-              enableDrag: true,           // abilita lo swipe per chiudere
-              backgroundColor: Colors.transparent, // opzionale: se vuoi sfondo trasparente
+              isScrollControlled: true, // per farla full screen
+              enableDrag: true, // abilita lo swipe per chiudere
+              backgroundColor:
+                  Colors.transparent, // opzionale: se vuoi sfondo trasparente
               builder: (context) => Container(
-                height: MediaQuery.of(context).size.height * 0.95,  // 95% altezza schermo
+                height:
+                    MediaQuery.of(context).size.height *
+                    0.95, // 95% altezza schermo
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -338,20 +360,25 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(
               context,
               PageRouteBuilder(
-                pageBuilder: (context, animation, secondaryAnimation) => StatsPage(),
-                transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                  const begin = Offset(1.0, 0.0);  // parte da destra
-                  const end = Offset.zero;
-                  const curve = Curves.ease;
+                pageBuilder: (context, animation, secondaryAnimation) =>
+                    StatsPage(),
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                      const begin = Offset(1.0, 0.0); // parte da destra
+                      const end = Offset.zero;
+                      const curve = Curves.ease;
 
-                  final tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-                  final offsetAnimation = animation.drive(tween);
+                      final tween = Tween(
+                        begin: begin,
+                        end: end,
+                      ).chain(CurveTween(curve: curve));
+                      final offsetAnimation = animation.drive(tween);
 
-                  return SlideTransition(
-                    position: offsetAnimation,
-                    child: child,
-                  );
-                },
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child,
+                      );
+                    },
               ),
             );
           }
@@ -363,10 +390,65 @@ class _HomePageState extends State<HomePage> {
               isDayTime
                   ? 'assets/imagePratoDay.png'
                   : 'assets/imagePratoNight.png',
-            fit: BoxFit.cover,
+              fit: BoxFit.cover,
             ),
-            Container(
-              color: Colors.black.withOpacity(0.2),
+            Container(color: Colors.black.withOpacity(0.2)),
+            Positioned(
+              top: 16,
+              right: 16,
+              child: AnimatedScale(
+                scale: _playButtonScaling ? 1.1 : 1.0,
+                duration: const Duration(milliseconds: 200),
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    final pet = context.read<Pet>();
+                    if (pet.isEgg) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (_) => AlertDialog(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          contentPadding: const EdgeInsets.all(24),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              Text(
+                                'Your egg cannot play games. Try to hatch it!',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    } else {
+                      setState(() => _playButtonScaling = true);
+                      Future.delayed(const Duration(milliseconds: 200), () {
+                        if (!mounted) return;
+                        setState(() => _playButtonScaling = false);
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const GamePage()),
+                        );
+                      });
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange,
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(22),
+                    ),
+                  ),
+                  icon: const Icon(Icons.videogame_asset),
+                  label: const Text('Play'),
+                ),
+              ),
             ),
             Center(
               child: Column(
@@ -378,8 +460,10 @@ class _HomePageState extends State<HomePage> {
                     clipBehavior: Clip.none,
                     children: [
                       GestureDetector(
-                        onLongPressStart: (_) => setState(() => _showStats = true),
-                        onLongPressEnd:   (_) => setState(() => _showStats = false),
+                        onLongPressStart: (_) =>
+                            setState(() => _showStats = true),
+                        onLongPressEnd: (_) =>
+                            setState(() => _showStats = false),
                         child: CircleAvatar(
                           radius: 80,
                           backgroundColor: Colors.orange.shade200,
@@ -391,15 +475,18 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      if (_showStats && !pet.isEgg) // se è un uovo non mostro neanche le statistiche
+                      if (_showStats &&
+                          !pet.isEgg) // se è un uovo non mostro neanche le statistiche
                         Positioned(
                           top: -110,
                           child: Material(
                             color: Colors.black.withOpacity(0.75),
-                              borderRadius: BorderRadius.circular(12),
-                              child: Padding(
+                            borderRadius: BorderRadius.circular(12),
+                            child: Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 16, vertical: 12),
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
                               child: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
@@ -423,7 +510,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                   const SizedBox(height: 12),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -435,33 +525,38 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ],
                     ),
-                    child: Text(
-                      _currentPhrase,
-                      textAlign: TextAlign.center,
-                    ),
+                    child: Text(_currentPhrase, textAlign: TextAlign.center),
                   ),
                   const SizedBox(height: 24),
 
                   // livello & passi
-                  Text('Level ${pet.level}',
+                  Text(
+                    'Level ${pet.level}',
                     style: Theme.of(context).textTheme.titleLarge!.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
-                    )
-                  ),
-                  const SizedBox(height: 10),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 4),
-                    child: LinearProgressIndicator(
-                      value: pet.xp / Pet.xpPerLevel,
-                      minHeight: 8,
-                      backgroundColor: isDayTime ? Colors.black12 : Colors.white12,
-                      valueColor:
-                      const AlwaysStoppedAnimation<Color>(Colors.lightBlueAccent),
                     ),
                   ),
                   const SizedBox(height: 10),
-                  Text('steps today: ${stepsManager.dailySteps}',
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32.0,
+                      vertical: 4,
+                    ),
+                    child: LinearProgressIndicator(
+                      value: pet.xp / Pet.xpPerLevel,
+                      minHeight: 8,
+                      backgroundColor: isDayTime
+                          ? Colors.black12
+                          : Colors.white12,
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        Colors.lightBlueAccent,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'steps today: ${stepsManager.dailySteps}',
                     style: TextStyle(
                       color: Colors.white,
                       fontStyle: FontStyle.italic,
@@ -475,49 +570,60 @@ class _HomePageState extends State<HomePage> {
                     duration: const Duration(milliseconds: 200),
                     child: FilledButton(
                       onPressed: () {
-                      if (pet.isEgg){
-                        showDialog(
+                        if (pet.isEgg) {
+                          showDialog(
                             context: context,
                             barrierDismissible: true,
                             builder: (_) => AlertDialog(
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
                               contentPadding: const EdgeInsets.all(24),
                               content: Column(
                                 mainAxisSize: MainAxisSize.min,
                                 children: const [
-                                  Text('Your egg could not eat yet! Walk more and try to hatch it.',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                                  Text(
+                                    'Your egg could not eat yet! Walk more and try to hatch it.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   SizedBox(height: 12),
-                                  Text('Your egg will hatch when it reach the level 1.',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 16)),
+                                  Text(
+                                    'Your egg will hatch when it reach the level 1.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(fontSize: 16),
+                                  ),
                                 ],
                               ),
                             ),
-                        );
-                      }else{
-                        setState(() => _feedButtonScaling = true);
-                        Future.delayed(const Duration(milliseconds: 200), () {
-                          if (!mounted) return;
-                          setState(() => _feedButtonScaling = false);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => const FeedPage()),
                           );
-                        });
-                      }
-                    },
-                    style: FilledButton.styleFrom(
-                      minimumSize: const Size(150, 44),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(22),
+                        } else {
+                          setState(() => _feedButtonScaling = true);
+                          Future.delayed(const Duration(milliseconds: 200), () {
+                            if (!mounted) return;
+                            setState(() => _feedButtonScaling = false);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const FeedPage(),
+                              ),
+                            );
+                          });
+                        }
+                      },
+                      style: FilledButton.styleFrom(
+                        minimumSize: const Size(150, 44),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(22),
+                        ),
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.black,
                       ),
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.black,
+                      child: const Text('Feed him'),
                     ),
-                    child: const Text('Feed him'),
-                  ),
                   ),
                   const SizedBox(height: 12),
                   AnimatedScale(
@@ -531,7 +637,9 @@ class _HomePageState extends State<HomePage> {
                           setState(() => _rewardsButtonScaling = false);
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const RewardsPage()),
+                            MaterialPageRoute(
+                              builder: (_) => const RewardsPage(),
+                            ),
                           );
                         });
                       },
@@ -556,46 +664,47 @@ class _HomePageState extends State<HomePage> {
 
       // ───────────── Pulsanti debug ─────────────
       floatingActionButton: kDebugMode
-      ? Column(
-      mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          FloatingActionButton.small(
-            heroTag: 'debugWalk',
-            tooltip: '+500 passi',
-            child: const Icon(Icons.directions_walk),
-            onPressed: () {
-              final stepsMgr = context.read<StepsManager>();
-              final petRef   = context.read<Pet>();
+          ? Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                FloatingActionButton.small(
+                  heroTag: 'debugWalk',
+                  tooltip: '+500 passi',
+                  child: const Icon(Icons.directions_walk),
+                  onPressed: () {
+                    final stepsMgr = context.read<StepsManager>();
+                    final petRef = context.read<Pet>();
 
-              stepsMgr.addSteps(500);
-              petRef.updateExp(500);
-            },
-          ),
-          const SizedBox(height: 12),
-          FloatingActionButton.small(
-            heroTag: 'debugReset',
-            tooltip: 'Reset app',
-            backgroundColor: Colors.redAccent,
-            child: const Icon(Icons.restart_alt),
-            onPressed: () async {
-              resetApp(context);
+                    stepsMgr.addSteps(500);
+                    petRef.updateExp(500);
+                  },
+                ),
+                const SizedBox(height: 12),
+                FloatingActionButton.small(
+                  heroTag: 'debugReset',
+                  tooltip: 'Reset app',
+                  backgroundColor: Colors.redAccent,
+                  child: const Icon(Icons.restart_alt),
+                  onPressed: () async {
+                    resetApp(context);
 
-              setState(() {
-                _previousLevel = -1;
-                _previousStage = -1;
-                _hatchDialogShown = false;
-              });
+                    setState(() {
+                      _previousLevel = -1;
+                      _previousStage = -1;
+                      _hatchDialogShown = false;
+                    });
 
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Dati resettati')),
-                );
-              }
-            },
-          ),
-        ],
-      ): null,
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Dati resettati')),
+                      );
+                    }
+                  },
+                ),
+              ],
+            )
+          : null,
     );
   }
 }
@@ -669,9 +778,10 @@ class _AppDrawer extends StatelessWidget {
             title: const Text('Bag'),
             onTap: () {
               Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => BagPage()),
-            );},
+                context,
+                MaterialPageRoute(builder: (context) => BagPage()),
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.bar_chart),
@@ -681,7 +791,8 @@ class _AppDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => StatsPage()),
-              );},
+              );
+            },
           ),
           ListTile(
             leading: const Icon(Icons.settings),
@@ -702,9 +813,9 @@ class _AppDrawer extends StatelessWidget {
 
 Future<void> resetApp(BuildContext context) async {
   final stepsMgr = context.read<StepsManager>();
-  final petRef   = context.read<Pet>();
-  final challengeMgr   = context.read<ChallengeManager>();
-  final bagMgr   = context.read<Bag>();
+  final petRef = context.read<Pet>();
+  final challengeMgr = context.read<ChallengeManager>();
+  final bagMgr = context.read<Bag>();
 
   await StorageService.clearAll();
   await stepsMgr.resetStepsAndGoals();
