@@ -42,7 +42,7 @@ class Pet extends ChangeNotifier {
       imagePath = 'assets/Monster.png';
     }
 
-    _updateStatsFromTime();  // Appena caricati, aggiorna valori da tempo passato
+    updateStatsFromTime();  // Appena caricati, aggiorna valori da tempo passato
     notifyListeners();
   }
 
@@ -56,7 +56,7 @@ class Pet extends ChangeNotifier {
     await StorageService.savePetXp(_xp);
   }
 
-  void _updateStatsFromTime() {
+  void updateStatsFromTime() {
     final now = DateTime.now();
     final elapsedMinutes = now.difference(lastUpdated).inMinutes;
 
@@ -85,7 +85,7 @@ class Pet extends ChangeNotifier {
 
   void _updateHappinessTimer() {
     if (hunger < 50) {
-      _happinessTimer ??= Timer.periodic(const Duration(seconds: 30), (_) {
+      _happinessTimer ??= Timer.periodic(const Duration(seconds: 5), (_) {
         if (hunger < 50) {
           happiness = (happiness - 1).clamp(0, 100);
           savePet();

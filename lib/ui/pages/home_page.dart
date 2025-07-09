@@ -79,6 +79,7 @@ class _HomePageState extends State<HomePage> {
   String _currentPhrase = '';
   Timer? _phraseTimer;
   Timer? _eggCheckTimer;
+  Timer? _hungerHappinessTimer;
   static const String eggPhrase =
       "Wonder what's inside? It needs more time, and more steps!";
 
@@ -92,6 +93,9 @@ class _HomePageState extends State<HomePage> {
       if (!_pet.isEgg && _currentPhrase == eggPhrase) {
         _changePhrase();
       }
+    });
+    _hungerHappinessTimer = Timer.periodic(const Duration(minutes: 10), (_) {
+      _pet.updateStatsFromTime();
     });
   }
 

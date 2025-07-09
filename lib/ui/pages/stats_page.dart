@@ -190,7 +190,7 @@ class _StatsPageState extends State<StatsPage> {
                   stepsManager.lifetimeSteps,
                   showArc: false,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 40),
                 RichText(
                   text: TextSpan(
                     style: const TextStyle(fontSize: 22, color: Colors.white),
