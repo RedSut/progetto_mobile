@@ -200,14 +200,9 @@ class StepsManager extends ChangeNotifier {
 
   void startMinuteTimer() {
     final now = DateTime.now();
-    final nextMinute = DateTime(
-      now.year,
-      now.month,
-      now.day,
-      now.hour,
-      now.minute + 1,
-    );
-    final duration = nextMinute.difference(now);
+    int nextQuarterMinute = ((now.minute / 15).ceil() * 15) % 60;
+    final next15Minutes = DateTime(now.year, now.month, now.day, now.hour + (nextQuarterMinute == 0 ? 1 : 0), nextQuarterMinute);
+    final duration = next15Minutes.difference(now);
 
     _minuteTimer?.cancel();
     _minuteTimer = Timer(duration, () {

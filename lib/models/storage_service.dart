@@ -194,7 +194,7 @@ class StorageService {
     return {};
   }
 
-  // 📌 Salva le challenge completate
+  // 📌 Salva le challenge claimate
   static Future<void> saveClaimedChallenges(List<String> claimedIds) async {
     final prefs = await _prefs;
     prefs.setStringList('claimedChallenges', claimedIds);

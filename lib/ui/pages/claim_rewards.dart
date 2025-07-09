@@ -25,6 +25,14 @@ class _RewardsPageState extends State<RewardsPage> {
   Duration minuteRemaining = const Duration();
   // Timer periodico che aggiorna i countdown ogni minuto
   Timer? timer;
+  // Prossima mezzanotte per la daily challenge
+  DateTime nextMidnight = DateTime(0);
+  // Prossima ora per la hourly challenge
+  DateTime nextHour = DateTime(0);
+  // Prossimo minuto per la minute challenge
+  DateTime next15Minutes = DateTime(0);
+  // Prossimo lunedì a mezzanotte per la weekly challenge
+  DateTime nextMonday = DateTime(0);
 
   // Metodo chiamato appena la schermata viene creata
   @override
@@ -37,56 +45,73 @@ class _RewardsPageState extends State<RewardsPage> {
     });
   }
 
-  // Calcola i tempi rimanenti per le challenge
-    void _updateTimes() {
+  void updateTimers(){
     final now = DateTime.now(); // Data e ora attuali
-
-    // Prossima mezzanotte per la daily challenge
-    final nextMidnight = DateTime(now.year, now.month, now.day + 1);
-
-    // Prossima ora per la hourly challenge
-    final nextHour = DateTime(now.year, now.month, now.day, now.hour + 1);
-
-    // Prossimo minuto per la minute challenge
-    final next15Minutes = DateTime(now.year, now.month, now.day, now.hour, now.minute + 15);
-
-    // Prossimo lunedì a mezzanotte per la weekly challenge
-    final nextMonday = DateTime(now.year, now.month, now.day)
-        .add(Duration(days: (8 - now.weekday) % 7 == 0 ? 7 : (8 - now.weekday) % 7));
-
-    // Aggiorna lo stato della schermata con i nuovi tempi rimanenti
-    setState(() {
-      dailyRemaining = nextMidnight.difference(now);
-      weeklyRemaining = DateTime(nextMonday.year, nextMonday.month, nextMonday.day)
-          .difference(now);
-      hourlyRemaining = nextHour.difference(now);
-      minuteRemaining = next15Minutes.difference(now);
-    });
-    // Ottieni challengeManager dal context
-    final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
-
-    // Se siamo entro 1 minuto dal reset, rimuove i claim sia a livello di
-    // ChallengeManager che degli indici salvati localmente per la UI
-    void removeClaim(String id) {
-      for (var i = 0; i < challengeManager.challenges.length; i++) {
-        if (challengeManager.challenges[i].id == id) {
-          _claimedChallenges.remove(i);
-        }
-      }
-      challengeManager.unclaimChallengeById(id);
+    var diff1 = nextMidnight.difference(now);
+    if (nextMidnight.year == 0 || diff1.inSeconds <= 60){
+      // Prossima mezzanotte per la daily challenge
+      nextMidnight = DateTime(now.year, now.month, now.day + 1);
     }
-    if (dailyRemaining.inSeconds <= 60) {
-      removeClaim('daily');
-      removeClaim('daily_leppa');
-      removeClaim('daily_rowap');
+    var diff2 = nextHour.difference(now);
+    if (nextHour.year == 0 || diff2.inSeconds <= 60){
+      // Prossima ora per la hourly challenge
+      nextHour = DateTime(now.year, now.month, now.day, now.hour + 1);
     }
-    if (weeklyRemaining.inSeconds <= 60) {
-      removeClaim('weekly');
+    var diff3 = next15Minutes.difference(now);
+    if (next15Minutes.year == 0 || diff3.inSeconds <= 60){
+      // Prossimo minuto per la minute challenge
+      int nextQuarterMinute = ((now.minute / 15).ceil() * 15) % 60;
+      next15Minutes = DateTime(now.year, now.month, now.day, now.hour + (nextQuarterMinute == 0 ? 1 : 0), nextQuarterMinute);
     }
-    if (hourlyRemaining.inSeconds <= 60) {
-      removeClaim('hourly');
+    var diff4 = nextMonday.difference(now);
+    if (nextMonday.year == 0 || diff4.inSeconds <= 60){
+      // Prossimo lunedì a mezzanotte per la weekly challenge
+      nextMonday = DateTime(now.year, now.month, now.day)
+          .add(Duration(days: (8 - now.weekday) % 7 == 0 ? 7 : (8 - now.weekday) % 7));
     }
   }
+
+  // Calcola i tempi rimanenti per le challenge
+    void _updateTimes() {
+      final now = DateTime.now(); // Data e ora attuali
+      updateTimers();
+
+      // Aggiorna lo stato della schermata con i nuovi tempi rimanenti
+      setState(() {
+        dailyRemaining = nextMidnight.difference(now);
+        weeklyRemaining = DateTime(nextMonday.year, nextMonday.month, nextMonday.day)
+            .difference(now);
+        hourlyRemaining = nextHour.difference(now);
+        minuteRemaining = next15Minutes.difference(now);
+      });
+      // Ottieni challengeManager dal context
+      final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
+      final stepsManager = Provider.of<StepsManager>(context, listen: false);
+      // Se siamo entro 1 minuto dal reset, rimuove i claim sia a livello di
+      // ChallengeManager che degli indici salvati localmente per la UI
+      void removeClaim(String id) {
+        for (var i = 0; i < challengeManager.challenges.length; i++) {
+          if (challengeManager.challenges[i].id == id) {
+            _claimedChallenges.remove(i);
+          }
+        }
+        challengeManager.unclaimChallengeById(id);
+      }
+      if (dailyRemaining.inSeconds <= 60) {
+        removeClaim('daily');
+        removeClaim('daily_leppa');
+        removeClaim('daily_rowap');
+      }
+      if (weeklyRemaining.inSeconds <= 60) {
+        removeClaim('weekly');
+      }
+      if (hourlyRemaining.inSeconds <= 60) {
+        removeClaim('hourly');
+      }
+      if (minuteRemaining.inSeconds <= 60) {
+        removeClaim('minute');
+      }
+    }
 
   // Converte una Duration in stringa tipo "1d23h59m"
   String _formatDuration(Duration duration) {
