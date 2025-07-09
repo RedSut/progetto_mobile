@@ -313,6 +313,17 @@ class StorageService {
     return prefs.getBool('statsTutorialShown') ?? false;
   }
 
+  // 📌 Memorizza se il tutorial della pagina feed è stato mostrato
+  static Future<void> saveFeedTutorialShown(bool shown) async {
+    final prefs = await _prefs;
+    prefs.setBool('feedTutorialShown', shown);
+  }
+
+  static Future<bool> getFeedTutorialShown() async {
+    final prefs = await _prefs;
+    return prefs.getBool('feedTutorialShown') ?? false;
+  }
+
   // 📌 Funzione per resettare tutto (debug/reset)
   static Future<void> clearAll() async {
     final prefs = await _prefs;

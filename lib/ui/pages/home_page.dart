@@ -366,7 +366,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Swipe right or tap here to open settings.',
+                  'Swipe right or tap here to open settings, view your bag with your foods and your stats.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],

@@ -212,7 +212,7 @@ class _GamePageState extends State<GamePage> {
                     child: const Text(
                       'Tilt your phone to move and jump across platforms. Avoid falling! '
                       'You can check our high score in the stats page. '
-                      'Also, every jump we make together gives me experience!',
+                      'Also, every jump we make together gives me experience!\n',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16),
                     ),
