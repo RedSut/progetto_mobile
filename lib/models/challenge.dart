@@ -55,7 +55,7 @@ class ChallengeManager extends ChangeNotifier{
   final List<Challenge> challenges = [
     Challenge(
       id: 'minute',
-      title: 'Minute Challenge',
+      title: '15 Minutes Challenge',
       reward: Reward(
         id: 'rew_m1',
         item: ItemManager().getItemById('it_001'),
@@ -67,8 +67,8 @@ class ChallengeManager extends ChangeNotifier{
       title: 'Hourly Challenge',
       reward: Reward(
         id: 'rew_h1',
-        item: ItemManager().getItemById('it_001'),
-        quantity: 1,
+        item: ItemManager().getItemById('it_002'),
+        quantity: 3,
       ),
     ),
     Challenge(

@@ -19,7 +19,7 @@ class StepsManager extends ChangeNotifier {
   int dailyGoal = 2000;
   int weeklyGoal = 10000;
   int hourlyGoal = 500;
-  int minuteGoal = 50;
+  int minuteGoal = 125;
 
   // 🔄 Costruttore 1: richiede l'istanza di Pet e chiama _init()
   StepsManager(this.pet) {
@@ -118,7 +118,7 @@ class StepsManager extends ChangeNotifier {
     dailyGoal = await StorageService.getDailyGoal();
     weeklyGoal = await StorageService.getWeeklyGoal();
     hourlyGoal = (dailyGoal / 4).round();
-    minuteGoal = (hourlyGoal / 10).round();
+    minuteGoal = (hourlyGoal / 4).round();
     notifyListeners();
   }
 

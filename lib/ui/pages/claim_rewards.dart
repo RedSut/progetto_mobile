@@ -48,7 +48,7 @@ class _RewardsPageState extends State<RewardsPage> {
     final nextHour = DateTime(now.year, now.month, now.day, now.hour + 1);
 
     // Prossimo minuto per la minute challenge
-    final nextMinute = DateTime(now.year, now.month, now.day, now.hour, now.minute + 1);
+    final next15Minutes = DateTime(now.year, now.month, now.day, now.hour, now.minute + 15);
 
     // Prossimo lunedì a mezzanotte per la weekly challenge
     final nextMonday = DateTime(now.year, now.month, now.day)
@@ -60,7 +60,7 @@ class _RewardsPageState extends State<RewardsPage> {
       weeklyRemaining = DateTime(nextMonday.year, nextMonday.month, nextMonday.day)
           .difference(now);
       hourlyRemaining = nextHour.difference(now);
-      minuteRemaining = nextMinute.difference(now);
+      minuteRemaining = next15Minutes.difference(now);
     });
     // Ottieni challengeManager dal context
     final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
