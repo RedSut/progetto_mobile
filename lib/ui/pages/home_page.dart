@@ -462,7 +462,7 @@ class _HomePageState extends State<HomePage> {
     TutorialCoachMark(
       targets: targets,
       colorShadow: Colors.black,
-      textSkip: 'SKIP',
+      textSkip: 'SKIP TUTORIAL',
       hideSkip: false,
       onFinish: () {
         StorageService.saveHomeTutorialShown(true);
