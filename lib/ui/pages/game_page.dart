@@ -41,6 +41,8 @@ class _GamePageState extends State<GamePage> {
   bool _started = false;
   bool _gameOver = false;
   int _highScore = 0;
+  bool _restartScaling = false;
+  bool _homeScaling = false;
 
   @override
   void initState() {
@@ -283,13 +285,37 @@ class _GamePageState extends State<GamePage> {
                     style: const TextStyle(fontSize: 20),
                   ),
                   const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      _resetGame();
-                      _startGame();
-                      setState(() {});
-                    },
-                    child: const Text('Restart'),
+                  AnimatedScale(
+                    scale: _restartScaling ? 1.1 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() => _restartScaling = true);
+                        Future.delayed(const Duration(milliseconds: 200), () {
+                          if (!mounted) return;
+                          setState(() => _restartScaling = false);
+                          _resetGame();
+                          _startGame();
+                        });
+                      },
+                      child: const Text('Restart'),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  AnimatedScale(
+                    scale: _homeScaling ? 1.1 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: OutlinedButton(
+                      onPressed: () {
+                        setState(() => _homeScaling = true);
+                        Future.delayed(const Duration(milliseconds: 200), () {
+                          if (!mounted) return;
+                          setState(() => _homeScaling = false);
+                          Navigator.pop(context);
+                        });
+                      },
+                      child: const Text('Home'),
+                    ),
                   ),
                 ],
               ),

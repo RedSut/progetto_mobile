@@ -263,33 +263,6 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       TargetFocus(
-        identify: 'play',
-        keyTarget: _playKey,
-        contents: [
-          TargetContent(
-            align: ContentAlign.bottom,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                Text(
-                  'Play',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  'Here you can play a minigame with your pet to earn more exp, when the egg will hatch.',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      TargetFocus(
         identify: 'feed',
         keyTarget: _feedKey,
         contents: [
@@ -336,6 +309,33 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 8),
                 Text(
                   'Collect prizes for your steps progress.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'play',
+        keyTarget: _playKey,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Play',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Here you can play a minigame with your pet to earn more exp, when the egg will hatch.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -449,7 +449,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Click here to see the menu again.',
+                  'Click here to see this tutorial again.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -702,64 +702,6 @@ class _HomePageState extends State<HomePage> {
               fit: BoxFit.cover,
             ),
             Container(color: Colors.black.withOpacity(0.2)),
-            Positioned(
-              top: 16,
-              right: 16,
-              child: AnimatedScale(
-                scale: _playButtonScaling ? 1.1 : 1.0,
-                duration: const Duration(milliseconds: 200),
-                child: ElevatedButton.icon(
-                  key: _playKey,
-                  onPressed: () {
-                    final pet = context.read<Pet>();
-                    if (pet.isEgg) {
-                      showDialog(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (_) => AlertDialog(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          contentPadding: const EdgeInsets.all(24),
-                          content: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: const [
-                              Text(
-                                'Your egg cannot play games. Try to hatch it!',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    } else {
-                      setState(() => _playButtonScaling = true);
-                      Future.delayed(const Duration(milliseconds: 200), () {
-                        if (!mounted) return;
-                        setState(() => _playButtonScaling = false);
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const GamePage()),
-                        );
-                      });
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.orange,
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(22),
-                    ),
-                  ),
-                  icon: const Icon(Icons.videogame_asset),
-                  label: const Text('Play'),
-                ),
-              ),
-            ),
             Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -886,98 +828,199 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // pulsanti feed / rewards
-                  AnimatedScale(
-                    scale: _feedButtonScaling ? 1.1 : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: FilledButton(
-                      key: _feedKey,
-                      onPressed: () {
-                        if (pet.isEgg) {
-                          showDialog(
-                            context: context,
-                            barrierDismissible: true,
-                            builder: (_) => AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              contentPadding: const EdgeInsets.all(24),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: const [
-                                  Text(
-                                    'Your egg could not eat yet! Walk more and try to hatch it.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
+                  // pulsanti feed / rewards / play
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      AnimatedScale(
+                        scale: _feedButtonScaling ? 1.1 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: FilledButton(
+                            key: _feedKey,
+                            onPressed: () {
+                              if (pet.isEgg) {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  builder: (_) => AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    contentPadding: const EdgeInsets.all(24),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Text(
+                                          'Your egg could not eat yet! Walk more and try to hatch it.',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        SizedBox(height: 12),
+                                        Text(
+                                          'Your egg will hatch when it reach the level 1.',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(height: 12),
-                                  Text(
-                                    'Your egg will hatch when it reach the level 1.',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(fontSize: 16),
+                                );
+                              } else {
+                                setState(() => _feedButtonScaling = true);
+                                Future.delayed(
+                                  const Duration(milliseconds: 200),
+                                  () {
+                                    if (!mounted) return;
+                                    setState(() => _feedButtonScaling = false);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const FeedPage(),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                            style: FilledButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.black,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.restaurant),
+                                SizedBox(height: 4),
+                                Text('Feed'),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      AnimatedScale(
+                        scale: _rewardsButtonScaling ? 1.1 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: OutlinedButton(
+                            key: _rewardsKey,
+                            onPressed: () {
+                              setState(() => _rewardsButtonScaling = true);
+                              Future.delayed(
+                                const Duration(milliseconds: 200),
+                                () {
+                                  if (!mounted) return;
+                                  setState(() => _rewardsButtonScaling = false);
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => const RewardsPage(),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            style: OutlinedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              backgroundColor: Colors.orange.shade100,
+                              foregroundColor: Colors.black,
+                              side: const BorderSide(color: Colors.orange),
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.card_giftcard),
+                                SizedBox(height: 4),
+                                Text('Rewards', textAlign: TextAlign.center),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      AnimatedScale(
+                        scale: _playButtonScaling ? 1.1 : 1.0,
+                        duration: const Duration(milliseconds: 200),
+                        child: SizedBox(
+                          width: 80,
+                          height: 80,
+                          child: ElevatedButton(
+                            key: _playKey,
+                            onPressed: () {
+                              final pet = context.read<Pet>();
+                              if (pet.isEgg) {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  builder: (_) => AlertDialog(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    contentPadding: const EdgeInsets.all(24),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Text(
+                                          'Your egg cannot play games. Try to hatch it!',
+                                          textAlign: TextAlign.center,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
-                                ],
+                                );
+                              } else {
+                                setState(() => _playButtonScaling = true);
+                                Future.delayed(
+                                  const Duration(milliseconds: 200),
+                                  () {
+                                    if (!mounted) return;
+                                    setState(() => _playButtonScaling = false);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => const GamePage(),
+                                      ),
+                                    );
+                                  },
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.orange,
+                              foregroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                          );
-                        } else {
-                          setState(() => _feedButtonScaling = true);
-                          Future.delayed(const Duration(milliseconds: 200), () {
-                            if (!mounted) return;
-                            setState(() => _feedButtonScaling = false);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) => const FeedPage(),
-                              ),
-                            );
-                          });
-                        }
-                      },
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(150, 44),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(22),
-                        ),
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.black,
-                      ),
-                      child: const Text('Feed him'),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  AnimatedScale(
-                    scale: _rewardsButtonScaling ? 1.1 : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: OutlinedButton(
-                      key: _rewardsKey,
-                      onPressed: () {
-                        setState(() => _rewardsButtonScaling = true);
-                        Future.delayed(const Duration(milliseconds: 200), () {
-                          if (!mounted) return;
-                          setState(() => _rewardsButtonScaling = false);
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) => const RewardsPage(),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Icon(Icons.videogame_asset),
+                                SizedBox(height: 4),
+                                Text('Play', textAlign: TextAlign.center),
+                              ],
                             ),
-                          );
-                        });
-                      },
-                      style: OutlinedButton.styleFrom(
-                        minimumSize: const Size(150, 44),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(22),
+                          ),
                         ),
-                        backgroundColor: Colors.orange.shade100,
-                        foregroundColor: Colors.black,
-                        side: const BorderSide(color: Colors.orange),
                       ),
-                      child: const Text('Claim rewards'),
-                    ),
+                    ],
                   ),
                 ],
               ),
