@@ -254,7 +254,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 8),
                 Text(
                   'This is your pet! Hold the pet to see if he\'s happy or hungry. Remember that eggs have nothing to say,'
-                  ' so try to hatch it!',
+                  ' so try to hatch it! You can earn exp by walking with him.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -281,7 +281,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Here you can play a minigame with your pet, when the egg will hatch.',
+                  'Here you can play a minigame with your pet to earn more exp, when the egg will hatch.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -866,6 +866,17 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   const SizedBox(height: 10),
+                  if (kDebugMode) ...[
+                    Text(
+                      'XP: ${pet.xp}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                  ],
                   Text(
                     'steps today: ${stepsManager.dailySteps}',
                     style: TextStyle(

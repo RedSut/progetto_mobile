@@ -1,10 +1,12 @@
 import 'dart:async';
-import 'pet.dart';
+
 import 'package:flutter/material.dart';
-import 'package:progetto_mobile/models/storage_service.dart';
-import 'challenge.dart';
-import 'package:pedometer/pedometer.dart';                // sensore pedometro reale
+import 'package:pedometer/pedometer.dart'; // sensore pedometro reale
 import 'package:permission_handler/permission_handler.dart';
+import 'package:progetto_mobile/models/storage_service.dart';
+
+import 'challenge.dart';
+import 'pet.dart';
 
 class StepsManager extends ChangeNotifier {
   Pet pet;
@@ -21,7 +23,7 @@ class StepsManager extends ChangeNotifier {
 
   // 🔄 Costruttore 1: richiede l'istanza di Pet e chiama _init()
   StepsManager(this.pet) {
-    _init();                         // Inizializzazione personalizzata
+    _init(); // Inizializzazione personalizzata
   }
 
   void attachPet(Pet p) {
@@ -44,7 +46,7 @@ class StepsManager extends ChangeNotifier {
   Timer? _hourlyTimer;
   Timer? _minuteTimer;
   StreamSubscription<StepCount>? _pedometerSub;
-  int _lastDeviceSteps = 0;           // valore precedente del sensore
+  int _lastDeviceSteps = 0; // valore precedente del sensore
 
   // 📌 Costruttore 2 (già presente)
   StepsManager.second(this.pet) {
@@ -58,7 +60,9 @@ class StepsManager extends ChangeNotifier {
       if (granted) {
         _startListening();
       } else {
-        debugPrint('Permesso ACTIVITY_RECOGNITION negato: il contapassi non verrà avviato.');
+        debugPrint(
+          'Permesso ACTIVITY_RECOGNITION negato: il contapassi non verrà avviato.',
+        );
       }
     });
   }
@@ -113,8 +117,8 @@ class StepsManager extends ChangeNotifier {
   Future<void> loadGoals() async {
     dailyGoal = await StorageService.getDailyGoal();
     weeklyGoal = await StorageService.getWeeklyGoal();
-    hourlyGoal = (dailyGoal/4).round();
-    minuteGoal = (hourlyGoal/10).round();
+    hourlyGoal = (dailyGoal / 4).round();
+    minuteGoal = (hourlyGoal / 10).round();
     notifyListeners();
   }
 
@@ -125,6 +129,7 @@ class StepsManager extends ChangeNotifier {
     _hourlySteps += steps;
     _minuteSteps += steps;
     pet.applySteps(steps);
+    pet.updateExp(steps); // 1 step = 1 XP
     saveSteps();
     notifyListeners(); // Notifica i widget ascoltatori per aggiornare la UI
   }
@@ -195,7 +200,13 @@ class StepsManager extends ChangeNotifier {
 
   void startMinuteTimer() {
     final now = DateTime.now();
-    final nextMinute = DateTime(now.year, now.month, now.day, now.hour, now.minute + 1);
+    final nextMinute = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      now.hour,
+      now.minute + 1,
+    );
     final duration = nextMinute.difference(now);
 
     _minuteTimer?.cancel();
@@ -304,7 +315,9 @@ class StepsManager extends ChangeNotifier {
       if (granted) {
         _startListening();
       } else {
-        debugPrint('Permesso ACTIVITY_RECOGNITION negato: il contapassi non verrà avviato.');
+        debugPrint(
+          'Permesso ACTIVITY_RECOGNITION negato: il contapassi non verrà avviato.',
+        );
       }
     });
   }

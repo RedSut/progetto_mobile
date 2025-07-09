@@ -59,6 +59,10 @@ class _GamePageState extends State<GamePage> {
       _highScore = _jumps;
       await StorageService.saveHighScore(_highScore);
     }
+
+    if (context.mounted) {
+      context.read<Pet>().updateExp(_jumps);
+    }
   }
 
   void _resetGame() {
