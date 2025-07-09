@@ -836,7 +836,7 @@ class _HomePageState extends State<HomePage> {
                         scale: _feedButtonScaling ? 1.1 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: SizedBox(
-                          width: 80,
+                          width: 100,
                           height: 80,
                           child: FilledButton(
                             key: _feedKey,
@@ -911,7 +911,7 @@ class _HomePageState extends State<HomePage> {
                         scale: _rewardsButtonScaling ? 1.1 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: SizedBox(
-                          width: 80,
+                          width: 100,
                           height: 80,
                           child: OutlinedButton(
                             key: _rewardsKey,
@@ -955,7 +955,7 @@ class _HomePageState extends State<HomePage> {
                         scale: _playButtonScaling ? 1.1 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: SizedBox(
-                          width: 80,
+                          width: 100,
                           height: 80,
                           child: ElevatedButton(
                             key: _playKey,

@@ -305,7 +305,7 @@ class _GamePageState extends State<GamePage> {
                   AnimatedScale(
                     scale: _homeScaling ? 1.1 : 1.0,
                     duration: const Duration(milliseconds: 200),
-                    child: OutlinedButton(
+                    child: ElevatedButton(
                       onPressed: () {
                         setState(() => _homeScaling = true);
                         Future.delayed(const Duration(milliseconds: 200), () {
@@ -314,6 +314,10 @@ class _GamePageState extends State<GamePage> {
                           Navigator.pop(context);
                         });
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.black,
+                      ),
                       child: const Text('Home'),
                     ),
                   ),
