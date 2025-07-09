@@ -211,7 +211,8 @@ class _GamePageState extends State<GamePage> {
                     ),
                     child: const Text(
                       'Tilt your phone to move and jump across platforms. Avoid falling! '
-                      'You can check our high score in the stats page.',
+                      'You can check our high score in the stats page. '
+                      'Also, every jump we make together gives me experience!',
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 16),
                     ),
@@ -305,7 +306,7 @@ class _GamePageState extends State<GamePage> {
                   AnimatedScale(
                     scale: _homeScaling ? 1.1 : 1.0,
                     duration: const Duration(milliseconds: 200),
-                    child: OutlinedButton(
+                    child: ElevatedButton(
                       onPressed: () {
                         setState(() => _homeScaling = true);
                         Future.delayed(const Duration(milliseconds: 200), () {
@@ -314,6 +315,10 @@ class _GamePageState extends State<GamePage> {
                           Navigator.pop(context);
                         });
                       },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        foregroundColor: Colors.black,
+                      ),
                       child: const Text('Home'),
                     ),
                   ),

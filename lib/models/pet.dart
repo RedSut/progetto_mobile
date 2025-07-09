@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';            // Necessario per ChangeNotifier
 import 'dart:async';
+
+import 'package:flutter/material.dart'; // Necessario per ChangeNotifier
 import 'package:permission_handler/permission_handler.dart';
+
 import 'notification_service.dart';
 import 'storage_service.dart';
 
@@ -42,7 +44,7 @@ class Pet extends ChangeNotifier {
       imagePath = 'assets/Monster.png';
     }
 
-    updateStatsFromTime();  // Appena caricati, aggiorna valori da tempo passato
+    updateStatsFromTime(); // Appena caricati, aggiorna valori da tempo passato
     notifyListeners();
   }
 
@@ -73,13 +75,13 @@ class Pet extends ChangeNotifier {
   }
 
   void _decreaseHunger(int minutes) {
-    int value = (minutes/5).round(); // scende di 12 ogni ora
+    int value = (minutes / 5).round(); // scende di 12 ogni ora
     hunger = (hunger - value).clamp(0, 100);
     _updateHappinessTimer();
   }
 
   void _decreaseHappiness(int minutes) {
-    int value = (minutes/10).round(); // scende di 6 ogni ora
+    int value = (minutes / 10).round(); // scende di 6 ogni ora
     happiness = (happiness - value).clamp(0, 100);
   }
 
@@ -99,11 +101,12 @@ class Pet extends ChangeNotifier {
   }
 
   Future<void> applySteps(int steps) async {
-    if (!isEgg){
+    if (!isEgg) {
       var dailyGoal = await StorageService.getDailyGoal();
-      int value = (dailyGoal/200).round(); // numero di passi che servono per far calare di 1 la fame e aumentare di 0.5 la felicità
-      hunger = (hunger - (steps/value).round()).clamp(0, 100);
-      happiness = (happiness + (steps/value*2).round()).clamp(0, 100);
+      int value = (dailyGoal / 200)
+          .round(); // numero di passi che servono per far calare di 1 la fame e aumentare di 0.5 la felicità
+      hunger = (hunger - (steps / value).round()).clamp(0, 100);
+      happiness = (happiness + (steps / value * 2).round()).clamp(0, 100);
       _updateHappinessTimer();
     }
     lastUpdated = DateTime.now();
@@ -161,13 +164,21 @@ class Pet extends ChangeNotifier {
     final granted = await _ensureNotificationPermission();
     if (granted) {
       if (hunger < hungerNotificationThreshold) {
-        NotificationService().showNotification('Il tuo pet ha fame!', 'Vai a dargli da mangiare!');
+        NotificationService().showNotification(
+          'Il tuo pet ha fame!',
+          'Vai a dargli da mangiare!',
+        );
       }
       if (happiness < hungerNotificationThreshold) {
-        NotificationService().showNotification('Il tuo pet è triste!', 'Fallo giocare un po\'!');
+        NotificationService().showNotification(
+          'Il tuo pet è triste!',
+          'Fallo giocare un po\'!',
+        );
       }
     } else {
-      debugPrint('Permesso NOTIFICATION negato: le notifiche non verranno mostrate.');
+      debugPrint(
+        'Permesso NOTIFICATION negato: le notifiche non verranno mostrate.',
+      );
     }
   }
 
@@ -190,5 +201,4 @@ class Pet extends ChangeNotifier {
     _happinessTimer?.cancel();
     super.dispose();
   }
-
 }
