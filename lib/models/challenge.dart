@@ -190,6 +190,12 @@ class ChallengeManager extends ChangeNotifier {
       progress = stepsManager.dailyProgress;
     } else if (challenge.id == 'weekly') {
       progress = stepsManager.weeklyProgress;
+    }else if (challenge.id == 'ch_001') {
+      progress = stepsManager.hourlyProgress;
+    } else if (challenge.id == 'ch_002') {
+      progress = stepsManager.hourlyProgress;
+    } else if (challenge.id == 'ch_003') {
+      progress = stepsManager.hourlyProgress;
     } else {
       final target = challenge.getStepsTarget(stepsManager);
       progress = stepsManager.steps / target;

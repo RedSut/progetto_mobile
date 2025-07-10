@@ -1,4 +1,3 @@
-// Importa i pacchetti necessari
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async'; // Per gestire Timer e DateTime
@@ -6,7 +5,6 @@ import '../../models/bag.dart';
 import '../../models/challenge.dart';
 import '../../models/steps.dart';
 
-// Definisce la schermata Rewards come Stateful perché deve aggiornare i timer nel tempo
 class RewardsPage extends StatefulWidget {
   const RewardsPage({super.key});
 
@@ -118,7 +116,9 @@ class _RewardsPageState extends State<RewardsPage> {
       margin: const EdgeInsets.symmetric(vertical: 12), // Spaziatura verticale
       padding: const EdgeInsets.all(16), // Padding interno
       decoration: BoxDecoration(
-        color: Colors.green.shade800, // Colore sfondo box
+        color: isClaimed
+            ? Colors.grey.shade800
+            : Colors.green.shade800, // Colore sfondo box
         borderRadius: BorderRadius.circular(16), // Angoli arrotondati
       ),
       child: Column(
