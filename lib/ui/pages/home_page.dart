@@ -402,7 +402,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Swipe right or tap here to open settings, view your bag with your food and your stats.',
+                  'You can swipe right or tap here to open settings, view your bag with your food and your stats.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -432,7 +432,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Swipe up to open your bag.',
+                  'you can swipe up here to open your bag.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -462,7 +462,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Swipe left to view your progress.',
+                  'You can swipe left here to view your progress.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
