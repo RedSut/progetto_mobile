@@ -366,7 +366,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Swipe right or tap here to open settings.',
+                  'Swipe right or tap here to open settings, view your bag with your foods and your stats.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -840,7 +840,7 @@ class _HomePageState extends State<HomePage> {
                         scale: _feedButtonScaling ? 1.1 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: SizedBox(
-                          width: 100,
+                          width: 105,
                           height: 80,
                           child: FilledButton(
                             key: _feedKey,
@@ -915,7 +915,7 @@ class _HomePageState extends State<HomePage> {
                         scale: _rewardsButtonScaling ? 1.1 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: SizedBox(
-                          width: 100,
+                          width: 105,
                           height: 80,
                           child: OutlinedButton(
                             key: _rewardsKey,
@@ -959,7 +959,7 @@ class _HomePageState extends State<HomePage> {
                         scale: _playButtonScaling ? 1.1 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: SizedBox(
-                          width: 100,
+                          width: 105,
                           height: 80,
                           child: ElevatedButton(
                             key: _playKey,

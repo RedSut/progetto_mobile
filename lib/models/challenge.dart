@@ -44,7 +44,7 @@ class Challenge {
     } else if (id == 'hourly') {
       return 'Walk for a total of $target steps this hour.';
     } else if (id == 'minute') {
-      return 'Walk for a total of $target steps this minute.';
+      return 'Walk for a total of $target steps in this 15 minutes.';
     }  else {
       return 'Walk for a total of $target steps.';
     }

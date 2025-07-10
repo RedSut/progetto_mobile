@@ -163,7 +163,7 @@ class _StatsPageState extends State<StatsPage> {
               mainAxisSize: MainAxisSize.min,
               children: const [
                 Text(
-                  'Track your progress here!',
+                  'This is your stats page!',
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
@@ -172,7 +172,7 @@ class _StatsPageState extends State<StatsPage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'These sections show your whole statistics.\n',
+                  'These sections show your whole statistics. Track your progress here!\n',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
                 ),

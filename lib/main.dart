@@ -4,7 +4,6 @@ import 'package:progetto_mobile/models/challenge.dart';
 import 'package:provider/provider.dart'; // Provider per dependency injection e stato
 
 import 'models/bag.dart';
-import 'models/notification_service.dart';
 import 'models/pet.dart'; // Modello Pet (logica di gioco)
 import 'models/steps.dart'; // Modello StepsManager (logica per i passi)
 import 'ui/pages/home_page.dart'; // Pagina Home dell’app
@@ -18,7 +17,6 @@ void main() async {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  await NotificationService().init();
   runApp(const PetStepsApp()); // Avvia il widget radice PetStepsApp
 }
 

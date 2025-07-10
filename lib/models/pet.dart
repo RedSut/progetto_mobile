@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart'; // Necessario per ChangeNotifier
 import 'package:permission_handler/permission_handler.dart';
 
-import 'notification_service.dart';
 import 'storage_service.dart';
 
 class Pet extends ChangeNotifier {
@@ -66,7 +65,6 @@ class Pet extends ChangeNotifier {
       if (!isEgg) {
         _decreaseHunger(elapsedMinutes);
         _decreaseHappiness(elapsedMinutes);
-        _checkPetStatus();
         _updateHappinessTimer();
       }
       lastUpdated = now;
@@ -158,28 +156,6 @@ class Pet extends ChangeNotifier {
     if (status.isGranted) return true;
     final result = await Permission.notification.request();
     return result.isGranted;
-  }
-
-  Future<void> _checkPetStatus() async {
-    final granted = await _ensureNotificationPermission();
-    if (granted) {
-      if (hunger < hungerNotificationThreshold) {
-        NotificationService().showNotification(
-          'Il tuo pet ha fame!',
-          'Vai a dargli da mangiare!',
-        );
-      }
-      if (happiness < hungerNotificationThreshold) {
-        NotificationService().showNotification(
-          'Il tuo pet è triste!',
-          'Fallo giocare un po\'!',
-        );
-      }
-    } else {
-      debugPrint(
-        'Permesso NOTIFICATION negato: le notifiche non verranno mostrate.',
-      );
-    }
   }
 
   Future<void> resetPet() async {

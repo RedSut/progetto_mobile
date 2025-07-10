@@ -3,9 +3,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
-import '../../models/pet.dart';
 import '../../models/bag.dart';
+import '../../models/pet.dart';
+import '../../models/storage_service.dart';
 
 class FeedPage extends StatefulWidget {
   const FeedPage({super.key});
@@ -44,11 +46,23 @@ class _FeedPageState extends State<FeedPage> {
   Timer? _phraseTimer;
   bool _showStars = false;
   final Set<int> _scalingItems = {}; // indices of items currently animating
+  bool _tutorialStarted = false;
+  final GlobalKey _hungerKey = GlobalKey();
+  final GlobalKey _bagKey = GlobalKey();
+  final GlobalKey _helpKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     _changePhrase();
+    _initTutorial();
+  }
+
+  Future<void> _initTutorial() async {
+    final shown = await StorageService.getFeedTutorialShown();
+    if (!shown && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showTutorial());
+    }
   }
 
   void _changePhrase() {
@@ -74,6 +88,147 @@ class _FeedPageState extends State<FeedPage> {
     });
   }
 
+  void _showTutorial() {
+    if (_tutorialStarted) return;
+    _tutorialStarted = true;
+    final size = MediaQuery.of(context).size;
+
+    final targets = [
+      TargetFocus(
+        identify: 'welcome',
+        targetPosition: TargetPosition(
+          Size.zero,
+          Offset(size.width / 2, size.height / 2),
+        ),
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Feeding time!',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Here you can feed your pet and check how hungry he is.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'hunger',
+        keyTarget: _hungerKey,
+        shape: ShapeLightFocus.RRect,
+        radius: 12,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Hunger bar',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Keep an eye on hunger to know when to feed him.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'bag',
+        keyTarget: _bagKey,
+        shape: ShapeLightFocus.RRect,
+        radius: 12,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Bag',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Your collected food is stored here.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'help',
+        keyTarget: _helpKey,
+        shape: ShapeLightFocus.RRect,
+        radius: 12,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: const [
+                Text(
+                  'Need help?',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Tap here to see this tutorial again.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ];
+
+    TutorialCoachMark(
+      targets: targets,
+      colorShadow: Colors.black,
+      textSkip: 'SKIP TUTORIAL',
+      hideSkip: false,
+      onFinish: () {
+        StorageService.saveFeedTutorialShown(true);
+      },
+      onSkip: () {
+        StorageService.saveFeedTutorialShown(true);
+        return true;
+      },
+    ).show(context: context);
+  }
+
   @override
   void dispose() {
     _phraseTimer?.cancel();
@@ -90,6 +245,16 @@ class _FeedPageState extends State<FeedPage> {
       appBar: AppBar(
         title: const Text('Feed'),
         backgroundColor: Colors.blue.shade200,
+        actions: [
+          IconButton(
+            key: _helpKey,
+            icon: const Icon(Icons.help_outline),
+            onPressed: () {
+              setState(() => _tutorialStarted = false);
+              _showTutorial();
+            },
+          ),
+        ],
       ),
       body: Stack(
         fit: StackFit.expand,
@@ -112,6 +277,7 @@ class _FeedPageState extends State<FeedPage> {
               ),
               const SizedBox(height: 16),
               LinearProgressIndicator(
+                key: _hungerKey,
                 value: pet.hunger / 100,
                 minHeight: 10,
                 color: Colors.orange,
@@ -194,6 +360,7 @@ class _FeedPageState extends State<FeedPage> {
               const SizedBox(height: 24),
               Expanded(
                 child: Container(
+                  key: _bagKey,
                   decoration: BoxDecoration(
                     color: Colors.blue.shade200,
                     borderRadius: const BorderRadius.only(
