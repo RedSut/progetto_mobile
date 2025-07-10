@@ -68,10 +68,14 @@ class _FeedPageState extends State<FeedPage> {
   void _changePhrase() {
     final random = Random();
     final pet = context.read<Pet>();
-    final phrases = pet.hunger < 50
-        ? FeedPage.veryHungryPhrases
-        : FeedPage.normalHungryPhrases;
-    _currentPhrase = phrases[random.nextInt(phrases.length)];
+    if (pet.hunger >= 100) {
+      _currentPhrase = "I'm ok, I don't need food";
+    } else {
+      final phrases = pet.hunger < 50
+          ? FeedPage.veryHungryPhrases
+          : FeedPage.normalHungryPhrases;
+      _currentPhrase = phrases[random.nextInt(phrases.length)];
+    }
     setState(() {});
 
     _phraseTimer?.cancel();
@@ -116,7 +120,7 @@ class _FeedPageState extends State<FeedPage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Here you can feed your pet and check how hungry he is.',
+                  'Here you can feed your pet and check how hungry it is.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
                 ),
@@ -146,7 +150,7 @@ class _FeedPageState extends State<FeedPage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Keep an eye on hunger to know when to feed him.',
+                  'Keep an eye on hunger to know when to feed it.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -386,7 +390,7 @@ class _FeedPageState extends State<FeedPage> {
                                   ),
                                   SizedBox(height: 16),
                                   Text(
-                                    'Try to complete some challenge, or claim the finished ones.',
+                                    'Try to complete some challenges, or claim the finished ones.',
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.black,

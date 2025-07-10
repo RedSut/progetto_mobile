@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:progetto_mobile/models/item.dart';
 import 'package:progetto_mobile/models/steps.dart';
 import 'package:progetto_mobile/models/storage_service.dart';
-import 'package:flutter/foundation.dart';
 
 import 'reward.dart';
 
@@ -45,13 +45,13 @@ class Challenge {
       return 'Walk for a total of $target steps this hour.';
     } else if (id == 'minute') {
       return 'Walk for a total of $target steps in this 15 minutes.';
-    }  else {
+    } else {
       return 'Walk for a total of $target steps.';
     }
   }
 }
 
-class ChallengeManager extends ChangeNotifier{
+class ChallengeManager extends ChangeNotifier {
   final List<Challenge> challenges = [
     Challenge(
       id: 'minute',
@@ -168,10 +168,40 @@ class ChallengeManager extends ChangeNotifier{
   }
 
   Future<void> resetClaimedChallenges() async {
-    for (var challenge in challenges){
+    for (var challenge in challenges) {
       challenge.isClaimed = false;
     }
     await StorageService.saveClaimedChallenges([]);
     notifyListeners();
+  }
+
+
+  double _getProgress(Challenge challenge, StepsManager stepsManager) {
+    if (challenge.isClaimed) return 0.0;
+
+    double progress;
+    if (challenge.id == 'minute') {
+      progress = stepsManager.minuteProgress;
+    } else if (challenge.id == 'hourly') {
+      progress = stepsManager.hourlyProgress;
+    } else if (challenge.id == 'daily' ||
+        challenge.id == 'daily_leppa' ||
+        challenge.id == 'daily_rowap') {
+      progress = stepsManager.dailyProgress;
+    } else if (challenge.id == 'weekly') {
+      progress = stepsManager.weeklyProgress;
+    } else {
+      final target = challenge.getStepsTarget(stepsManager);
+      progress = stepsManager.steps / target;
+    }
+
+    return progress >= 1.0 ? 1.0 : 0.0;
+  }
+
+  bool hasReadyToClaim(StepsManager stepsManager) {
+    for (final challenge in challenges) {
+      if (_getProgress(challenge, stepsManager) >= 1.0) return true;
+    }
+    return false;
   }
 }

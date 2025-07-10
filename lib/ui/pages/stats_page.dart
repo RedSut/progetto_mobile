@@ -22,7 +22,6 @@ class _StatsPageState extends State<StatsPage> {
     "Keep going, you are great!",
     "Every step count!",
     "Your pet is proud of you!",
-    "You are in the right way!",
     "Great, don't stop!",
   ];
 

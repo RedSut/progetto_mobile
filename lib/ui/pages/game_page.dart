@@ -273,56 +273,63 @@ class _GamePageState extends State<GamePage> {
           ],
           if (_gameOver)
             Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Game Over',
-                    style: TextStyle(fontSize: 32, color: Colors.red),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'High score: $_highScore',
-                    style: const TextStyle(fontSize: 20),
-                  ),
-                  const SizedBox(height: 16),
-                  AnimatedScale(
-                    scale: _restartScaling ? 1.1 : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() => _restartScaling = true);
-                        Future.delayed(const Duration(milliseconds: 200), () {
-                          if (!mounted) return;
-                          setState(() => _restartScaling = false);
-                          _resetGame();
-                          _startGame();
-                        });
-                      },
-                      child: const Text('Restart'),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.8),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Game Over',
+                      style: TextStyle(fontSize: 32, color: Colors.red),
                     ),
-                  ),
-                  const SizedBox(height: 12),
-                  AnimatedScale(
-                    scale: _homeScaling ? 1.1 : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() => _homeScaling = true);
-                        Future.delayed(const Duration(milliseconds: 200), () {
-                          if (!mounted) return;
-                          setState(() => _homeScaling = false);
-                          Navigator.pop(context);
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.orange,
-                        foregroundColor: Colors.black,
+                    const SizedBox(height: 8),
+                    Text(
+                      'High score: $_highScore',
+                      style: const TextStyle(fontSize: 20),
+                    ),
+                    const SizedBox(height: 16),
+                    AnimatedScale(
+                      scale: _restartScaling ? 1.1 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() => _restartScaling = true);
+                          Future.delayed(const Duration(milliseconds: 200), () {
+                            if (!mounted) return;
+                            setState(() => _restartScaling = false);
+                            _resetGame();
+                            _startGame();
+                          });
+                        },
+                        child: const Text('Restart'),
                       ),
-                      child: const Text('Home'),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    AnimatedScale(
+                      scale: _homeScaling ? 1.1 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() => _homeScaling = true);
+                          Future.delayed(const Duration(milliseconds: 200), () {
+                            if (!mounted) return;
+                            setState(() => _homeScaling = false);
+                            Navigator.pop(context);
+                          });
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.orange,
+                          foregroundColor: Colors.black,
+                        ),
+                        child: const Text('Home'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
         ],

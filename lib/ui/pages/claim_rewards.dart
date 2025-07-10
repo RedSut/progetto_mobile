@@ -1,7 +1,9 @@
 // Importa i pacchetti necessari
+import 'dart:async'; // Per gestire Timer e DateTime
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:async'; // Per gestire Timer e DateTime
+
 import '../../models/bag.dart';
 import '../../models/challenge.dart';
 import '../../models/steps.dart';
@@ -38,7 +40,7 @@ class _RewardsPageState extends State<RewardsPage> {
   }
 
   // Calcola i tempi rimanenti per le challenge
-    void _updateTimes() {
+  void _updateTimes() {
     final now = DateTime.now(); // Data e ora attuali
 
     // Prossima mezzanotte per la daily challenge
@@ -48,22 +50,35 @@ class _RewardsPageState extends State<RewardsPage> {
     final nextHour = DateTime(now.year, now.month, now.day, now.hour + 1);
 
     // Prossimo minuto per la minute challenge
-    final next15Minutes = DateTime(now.year, now.month, now.day, now.hour, now.minute + 15);
+    final next15Minutes = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      now.hour,
+      now.minute + 15,
+    );
 
     // Prossimo lunedì a mezzanotte per la weekly challenge
-    final nextMonday = DateTime(now.year, now.month, now.day)
-        .add(Duration(days: (8 - now.weekday) % 7 == 0 ? 7 : (8 - now.weekday) % 7));
+    final nextMonday = DateTime(now.year, now.month, now.day).add(
+      Duration(days: (8 - now.weekday) % 7 == 0 ? 7 : (8 - now.weekday) % 7),
+    );
 
     // Aggiorna lo stato della schermata con i nuovi tempi rimanenti
     setState(() {
       dailyRemaining = nextMidnight.difference(now);
-      weeklyRemaining = DateTime(nextMonday.year, nextMonday.month, nextMonday.day)
-          .difference(now);
+      weeklyRemaining = DateTime(
+        nextMonday.year,
+        nextMonday.month,
+        nextMonday.day,
+      ).difference(now);
       hourlyRemaining = nextHour.difference(now);
       minuteRemaining = next15Minutes.difference(now);
     });
     // Ottieni challengeManager dal context
-    final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
+    final challengeManager = Provider.of<ChallengeManager>(
+      context,
+      listen: false,
+    );
 
     // Se siamo entro 1 minuto dal reset, rimuove i claim sia a livello di
     // ChallengeManager che degli indici salvati localmente per la UI
@@ -75,6 +90,7 @@ class _RewardsPageState extends State<RewardsPage> {
       }
       challengeManager.unclaimChallengeById(id);
     }
+
     if (dailyRemaining.inSeconds <= 60) {
       removeClaim('daily');
       removeClaim('daily_leppa');
@@ -90,25 +106,27 @@ class _RewardsPageState extends State<RewardsPage> {
 
   // Converte una Duration in stringa tipo "1d23h59m"
   String _formatDuration(Duration duration) {
-    int days = duration.inDays;                                  // Numero di giorni interi
-    int hours = duration.inHours.remainder(24);                   // Ore residue dopo i giorni
-    int minutes = duration.inMinutes.remainder(60);               // Minuti residui dopo le ore
+    int days = duration.inDays; // Numero di giorni interi
+    int hours = duration.inHours.remainder(24); // Ore residue dopo i giorni
+    int minutes = duration.inMinutes.remainder(
+      60,
+    ); // Minuti residui dopo le ore
 
     String result = '';
-    if (days > 0) result += '${days}d';                          // Aggiunge "Nd" se ci sono giorni
-    if (hours > 0) result += '${hours}h';                        // Aggiunge "Nh" se ci sono ore
-    if (minutes > 0) result += '${minutes}m';                    // Aggiunge "Nm" se ci sono minuti
-    if (result.isEmpty) result = '0m';                           // Se tutto zero, mostra "0m"
+    if (days > 0) result += '${days}d'; // Aggiunge "Nd" se ci sono giorni
+    if (hours > 0) result += '${hours}h'; // Aggiunge "Nh" se ci sono ore
+    if (minutes > 0) result += '${minutes}m'; // Aggiunge "Nm" se ci sono minuti
+    if (result.isEmpty) result = '0m'; // Se tutto zero, mostra "0m"
 
     return result;
   }
-
 
   // Crea il widget grafico per una challenge
   Widget _buildChallenge({
     required Challenge challenge,
     required double progress,
-    required VoidCallback onClaimPressed, // Funzione per aggiornare challenge.claimed
+    required VoidCallback
+    onClaimPressed, // Funzione per aggiornare challenge.claimed
     required bool isClaiming,
     required bool isClaimed,
     required String duration,
@@ -118,7 +136,9 @@ class _RewardsPageState extends State<RewardsPage> {
       margin: const EdgeInsets.symmetric(vertical: 12), // Spaziatura verticale
       padding: const EdgeInsets.all(16), // Padding interno
       decoration: BoxDecoration(
-        color: Colors.green.shade800, // Colore sfondo box
+        color: isClaimed
+            ? Colors.grey.shade800
+            : Colors.green.shade800, // Colore sfondo box
         borderRadius: BorderRadius.circular(16), // Angoli arrotondati
       ),
       child: Column(
@@ -134,10 +154,7 @@ class _RewardsPageState extends State<RewardsPage> {
           ),
           const SizedBox(height: 8), // Spaziatura
           // Descrizione obiettivo
-          Text(
-            description,
-            style: const TextStyle(color: Colors.white70),
-          ),
+          Text(description, style: const TextStyle(color: Colors.white70)),
           const SizedBox(height: 12),
           // Barra di avanzamento
           LinearProgressIndicator(
@@ -154,8 +171,11 @@ class _RewardsPageState extends State<RewardsPage> {
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: progress >= 1.0
-                    ? Colors.orange  // Colore normale se attivo
-                    : Colors.orange.withAlpha((255 * 0.3).round()), // Colore più trasparente se disabilitato
+                    ? Colors
+                          .orange // Colore normale se attivo
+                    : Colors.orange.withAlpha(
+                        (255 * 0.3).round(),
+                      ), // Colore più trasparente se disabilitato
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30), // Angoli arrotondati
                 ),
@@ -164,7 +184,8 @@ class _RewardsPageState extends State<RewardsPage> {
                   ? onClaimPressed
                   : null,
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center, // Centra il contenuto
+                mainAxisAlignment:
+                    MainAxisAlignment.center, // Centra il contenuto
                 children: [
                   Text(
                     challenge.isClaimed ? 'CLAIMED' : 'CLAIM REWARD',
@@ -191,7 +212,6 @@ class _RewardsPageState extends State<RewardsPage> {
       ),
     );
   }
-
 
   // Metodo chiamato quando la schermata viene chiusa
   @override
@@ -242,14 +262,19 @@ class _RewardsPageState extends State<RewardsPage> {
                   } else if (challenge.id == 'hourly') {
                     progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
                     duration = '- ${_formatDuration(hourlyRemaining)}';
-                  } else if (challenge.id == 'daily' || challenge.id == 'daily_leppa' || challenge.id == 'daily_rowap') {
+                  } else if (challenge.id == 'daily' ||
+                      challenge.id == 'daily_leppa' ||
+                      challenge.id == 'daily_rowap') {
                     progress = stepsManager.dailyProgress.clamp(0.0, 1.0);
                     duration = '- ${_formatDuration(dailyRemaining)}';
                   } else if (challenge.id == 'weekly') {
                     progress = stepsManager.weeklyProgress.clamp(0.0, 1.0);
                     duration = '- ${_formatDuration(weeklyRemaining)}';
                   } else {
-                    progress = (stepsManager.steps / stepsTarget).clamp(0.0, 1.0);
+                    progress = (stepsManager.steps / stepsTarget).clamp(
+                      0.0,
+                      1.0,
+                    );
                   }
 
                   return _buildChallenge(
@@ -257,36 +282,42 @@ class _RewardsPageState extends State<RewardsPage> {
                     duration: duration,
                     challenge: challenge,
                     progress: progress,
-                    isClaimed: challenge.isClaimed || _claimedChallenges.contains(i),
+                    isClaimed:
+                        challenge.isClaimed || _claimedChallenges.contains(i),
                     isClaiming: _claimingChallenges.contains(i),
                     onClaimPressed: () {
-                      if (_claimedChallenges.contains(i) || _claimingChallenges.contains(i)) return;
+                      if (_claimedChallenges.contains(i) ||
+                          _claimingChallenges.contains(i))
+                        return;
 
                       setState(() {
                         _claimingChallenges.add(i);
                       });
 
                       final bag = Provider.of<Bag>(context, listen: false);
-                      bag.addItem(challenge.reward.item, challenge.reward.quantity);
+                      bag.addItem(
+                        challenge.reward.item,
+                        challenge.reward.quantity,
+                      );
 
                       Future.delayed(const Duration(milliseconds: 300), () {
-                      if (!mounted) return;
-                      setState(() {
-                      challengeManager.claimChallenge(challenge);
-                      _claimedChallenges.add(i);
-                      _claimingChallenges.remove(i);
-                      });
+                        if (!mounted) return;
+                        setState(() {
+                          challengeManager.claimChallenge(challenge);
+                          _claimedChallenges.add(i);
+                          _claimingChallenges.remove(i);
+                        });
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                      content: Text(
-                      'You received ${challenge.reward.quantity}x ${challenge.reward.item.name}!',
-                      ),
-                      behavior: SnackBarBehavior.floating,
-                      backgroundColor: Colors.green.shade600,
-                      duration: const Duration(seconds: 3),
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'You received ${challenge.reward.quantity}x ${challenge.reward.item.name}!',
+                            ),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.green.shade600,
+                            duration: const Duration(seconds: 3),
                           ),
-                      );
+                        );
                       });
                     },
                   );

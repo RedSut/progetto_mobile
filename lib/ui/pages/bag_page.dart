@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:progetto_mobile/ui/pages/home_page.dart';
 import 'package:provider/provider.dart';
+
 import '../../models/bag.dart';
 
 class BagPage extends StatelessWidget {
@@ -11,7 +12,7 @@ class BagPage extends StatelessWidget {
     final bag = Provider.of<Bag>(context);
 
     return Container(
-      height: MediaQuery.of(context).size.height,  // full height
+      height: MediaQuery.of(context).size.height, // full height
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
@@ -19,7 +20,7 @@ class BagPage extends StatelessWidget {
       child: Scaffold(
         backgroundColor: Colors.green.shade900,
         appBar: AppBar(
-          title: const Text('Your Bag', style: TextStyle(color: Colors.white),),
+          title: const Text('Your Bag', style: TextStyle(color: Colors.white)),
           backgroundColor: Colors.green.shade900,
           elevation: 0,
           foregroundColor: Colors.white,
@@ -51,7 +52,7 @@ class BagPage extends StatelessWidget {
                         ),
                         SizedBox(height: 16),
                         Text(
-                          'Try to complete some challenge, or claim the finished ones.',
+                          'Try to complete some challenges, or claim the finished ones.',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: Colors.white,
@@ -71,65 +72,90 @@ class BagPage extends StatelessWidget {
                       final item = entry.key;
                       final quantity = entry.value;
 
-                return InkWell(
-                  onTap: () {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: Text(item.name, style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-                        backgroundColor: Colors.green.shade800,
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Image.asset(item.imagePath, width: 80, height: 80),
-                            const SizedBox(height: 8),
-                            Text(item.description, style: TextStyle(color: Colors.white, fontStyle: FontStyle.italic),),
-                          ],
-                        ),
-                        actions: [
-                          TextButton(
-                            style: ButtonStyle(backgroundColor: MaterialStateProperty.all(Colors.white),),
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Close', style: TextStyle(color: Colors.black)),
+                      return InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: Text(
+                                item.name,
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              backgroundColor: Colors.green.shade800,
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Image.asset(
+                                    item.imagePath,
+                                    width: 80,
+                                    height: 80,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    item.description,
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontStyle: FontStyle.italic,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                TextButton(
+                                  style: ButtonStyle(
+                                    backgroundColor: MaterialStateProperty.all(
+                                      Colors.white,
+                                    ),
+                                  ),
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: const Text(
+                                    'Close',
+                                    style: TextStyle(color: Colors.black),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade800,
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                        ],
-                      ),
-                    );
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade800,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    padding: const EdgeInsets.all(12),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(
-                          item.imagePath,
-                          width: 80,
-                          height: 80,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          item.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Image.asset(
+                                item.imagePath,
+                                width: 80,
+                                height: 80,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                item.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'x$quantity',
+                                style: const TextStyle(
+                                  color: Colors.orange,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'x$quantity',
-                          style:
-                          const TextStyle(color: Colors.orange, fontSize: 18),
-                        ),
-                      ],
-                    ),
+                      );
+                    }).toList(),
                   ),
-                );
-              }).toList(),
-            ),
           ),
         ),
       ),

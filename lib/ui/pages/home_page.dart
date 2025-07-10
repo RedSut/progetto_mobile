@@ -199,6 +199,42 @@ class _HomePageState extends State<HomePage> {
     _phraseTimer = Timer(const Duration(seconds: 30), _changePhrase);
   }
 
+  bool _hasUnclaimedRewards(
+    StepsManager stepsManager,
+    ChallengeManager challengeManager,
+  ) {
+    for (final challenge in challengeManager.challenges) {
+      if (challenge.isClaimed) continue;
+
+      final stepsTarget = challenge.getStepsTarget(stepsManager);
+      double progress;
+      if (challenge.id == 'minute') {
+        progress = stepsManager.minuteProgress.clamp(0.0, 1.0);
+      } else if (challenge.id == 'hourly') {
+        progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
+      } else if (challenge.id == 'daily' ||
+          challenge.id == 'daily_leppa' ||
+          challenge.id == 'daily_rowap') {
+        progress = stepsManager.dailyProgress.clamp(0.0, 1.0);
+      } else if (challenge.id == 'weekly') {
+        progress = stepsManager.weeklyProgress.clamp(0.0, 1.0);
+      } else if (challenge.id == 'ch_001') {
+        progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
+      } else if (challenge.id == 'ch_002') {
+        progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
+      } else if (challenge.id == 'ch_003') {
+        progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
+      } else {
+        progress = (stepsManager.steps / stepsTarget).clamp(0.0, 1.0);
+      }
+
+      if (progress >= 1.0) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   void _showTutorial() {
     if (_tutorialStarted) return;
     _tutorialStarted = true;
@@ -229,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   'You have recived a strange egg, try to hatch it! It will become your personal pet, '
                   'so take care of him while you stay active.\n'
-                  'Click on the buttons to complete the tutorial!',
+                  'Click on the highlighted zones to complete the tutorial!',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
                 ),
@@ -285,7 +321,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Remember to don\'t let him starve. Of course, for now, you cant feed an egg.',
+                  'Remember to not let him starve. Of course, for now, you cant feed an egg.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -366,7 +402,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Swipe right or tap here to open settings, view your bag with your foods and your stats.',
+                  'Swipe right or tap here to open settings, view your bag with your food and your stats.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -491,6 +527,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final pet = context.watch<Pet>();
     final stepsManager = context.watch<StepsManager>();
+    final challengeManager = context.watch<ChallengeManager>();
 
     // Calcolo dell'orario per l'immagine di sfondo, se tra le 6 e le 18 → giorno, altrimenti notte
     final hour = DateTime.now().hour;
@@ -519,14 +556,14 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 16),
                 Text(
-                  'Your egg is hatched!',
+                  'Your egg has hatched!',
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 18),
                 ),
                 SizedBox(height: 12),
                 Text(
                   'Now you can take care of your pet, play with him and grow it up! 🐒'
-                  ' Remember that you can see his feelings just holding on him.',
+                  ' Remember that you can see his feelings just press and hold on him.',
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -642,7 +679,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       drawer: const _AppDrawer(),
-      drawerEdgeDragWidth: 30.0,
+      drawerEdgeDragWidth: MediaQuery.of(context).size.width * 0.2,
 
       // ─────────────── Corpo ───────────────
       body: GestureDetector(
@@ -858,7 +895,7 @@ class _HomePageState extends State<HomePage> {
                                       mainAxisSize: MainAxisSize.min,
                                       children: const [
                                         Text(
-                                          'Your egg could not eat yet! Walk more and try to hatch it.',
+                                          'Your egg can\'t eat yet! Walk more and try to hatch it.',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(
                                             fontSize: 16,
@@ -867,7 +904,7 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                         SizedBox(height: 12),
                                         Text(
-                                          'Your egg will hatch when it reach the level 1.',
+                                          'Your egg will hatch when it reaches level 1.',
                                           textAlign: TextAlign.center,
                                           style: TextStyle(fontSize: 16),
                                         ),
@@ -917,40 +954,58 @@ class _HomePageState extends State<HomePage> {
                         child: SizedBox(
                           width: 105,
                           height: 80,
-                          child: OutlinedButton(
-                            key: _rewardsKey,
-                            onPressed: () {
-                              setState(() => _rewardsButtonScaling = true);
-                              Future.delayed(
-                                const Duration(milliseconds: 200),
-                                () {
-                                  if (!mounted) return;
-                                  setState(() => _rewardsButtonScaling = false);
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => const RewardsPage(),
-                                    ),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              OutlinedButton(
+                                key: _rewardsKey,
+                                onPressed: () {
+                                  setState(() => _rewardsButtonScaling = true);
+                                  Future.delayed(
+                                    const Duration(milliseconds: 200),
+                                        () {
+                                      if (!mounted) return;
+                                      setState(() => _rewardsButtonScaling = false);
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => const RewardsPage(),
+                                        ),
+                                      );
+                                    },
                                   );
                                 },
-                              );
-                            },
-                            style: OutlinedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                                style: OutlinedButton.styleFrom(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  backgroundColor: Colors.orange.shade100,
+                                  foregroundColor: Colors.black,
+                                  side: const BorderSide(color: Colors.orange),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: const [
+                                    Icon(Icons.card_giftcard),
+                                    SizedBox(height: 4),
+                                    Text('Rewards', textAlign: TextAlign.center),
+                                  ],
+                                ),
                               ),
-                              backgroundColor: Colors.orange.shade100,
-                              foregroundColor: Colors.black,
-                              side: const BorderSide(color: Colors.orange),
-                            ),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Icon(Icons.card_giftcard),
-                                SizedBox(height: 4),
-                                Text('Rewards', textAlign: TextAlign.center),
-                              ],
-                            ),
+                              if (challengeManager.hasReadyToClaim(stepsManager))
+                                Positioned(
+                                  top: 4,
+                                  right: 4,
+                                  child: Container(
+                                    width: 12,
+                                    height: 12,
+                                    decoration: const BoxDecoration(
+                                      color: Colors.red,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ),

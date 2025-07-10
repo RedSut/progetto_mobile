@@ -1,5 +1,4 @@
-
-class Item{
+class Item {
   final String id;
   final String name;
   final String imagePath;
@@ -17,46 +16,56 @@ class Item{
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-          other is Item &&
-              runtimeType == other.runtimeType &&
-              name == other.name &&
-              imagePath == other.imagePath;
+      other is Item &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          imagePath == other.imagePath;
 
   @override
   int get hashCode => name.hashCode ^ imagePath.hashCode;
 }
 
-class ItemManager{
+class ItemManager {
   final List<Item> items = [
     const Item(
       id: 'it_001',
       name: 'Pecha',
       imagePath: 'assets/itemPecha.png',
-      description: "It strongly resembles a peach, but it's much larger. It could feed your pet a lot.",
+      description:
+          "It strongly resembles a peach, but it's much larger. Give this to your pet, it"
+          "can feed it a lot.",
       feedValue: 20,
     ),
     const Item(
       id: 'it_002',
       name: 'Leppa',
       imagePath: 'assets/itemLeppa.png',
-      description: 'It strongly resembles a tangerine, but it has different colors. It could feed your pet.',
+      description:
+          'It strongly resembles a tangerine, but it has different colors. Your pet can eat this.',
       feedValue: 15,
     ),
     const Item(
       id: 'it_003',
       name: 'Rowap',
       imagePath: 'assets/itemRowap.png',
-      description: "It strongly resembles grapes, but it's much stranger. It could feed your pet just a little.",
+      description:
+          "It strongly resembles grapes, but it's much stranger. You can feed your"
+          "pet just a little with it.",
       feedValue: 10,
     ),
   ];
 
-  Item getItemById(String id){
-    for (Item item in items){
-      if (item.id == id){
+  Item getItemById(String id) {
+    for (Item item in items) {
+      if (item.id == id) {
         return item;
       }
     }
-    return Item(id: "notFound", name: "Not Found", imagePath: "", description: "");
+    return Item(
+      id: "notFound",
+      name: "Not Found",
+      imagePath: "",
+      description: "",
+    );
   }
 }
