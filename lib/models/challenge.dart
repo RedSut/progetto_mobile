@@ -28,8 +28,6 @@ class Challenge {
       return stepsManager.weeklyGoal;
     } else if (id == 'hourly') {
       return stepsManager.hourlyGoal;
-    } else if (id == 'minute') {
-      return stepsManager.minuteGoal;
     } else {
       return steps ?? 0;
     }
@@ -53,15 +51,6 @@ class Challenge {
 
 class ChallengeManager extends ChangeNotifier {
   final List<Challenge> challenges = [
-    Challenge(
-      id: 'minute',
-      title: '15 Minutes Challenge',
-      reward: Reward(
-        id: 'rew_m1',
-        item: ItemManager().getItemById('it_001'),
-        quantity: 1,
-      ),
-    ),
     Challenge(
       id: 'hourly',
       title: 'Hourly Challenge',
@@ -179,9 +168,7 @@ class ChallengeManager extends ChangeNotifier {
     if (challenge.isClaimed) return 0.0;
 
     double progress;
-    if (challenge.id == 'minute') {
-      progress = stepsManager.minuteProgress;
-    } else if (challenge.id == 'hourly') {
+    if (challenge.id == 'hourly') {
       progress = stepsManager.hourlyProgress;
     } else if (challenge.id == 'daily' ||
         challenge.id == 'daily_leppa' ||

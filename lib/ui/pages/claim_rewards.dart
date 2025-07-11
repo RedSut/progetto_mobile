@@ -20,7 +20,6 @@ class _RewardsPageState extends State<RewardsPage> {
   Duration dailyRemaining = const Duration();
   Duration weeklyRemaining = const Duration();
   Duration hourlyRemaining = const Duration();
-  Duration minuteRemaining = const Duration();
   // Timer periodico che aggiorna i countdown ogni minuto
   Timer? timer;
 
@@ -45,10 +44,6 @@ class _RewardsPageState extends State<RewardsPage> {
     // Prossima ora per la hourly challenge
     final nextHour = DateTime(now.year, now.month, now.day, now.hour + 1);
 
-    // Prossimo minuto per la minute challenge
-    int nextQuarterMinute = (((now.minute + 14) ~/ 15) * 15) % 60;
-    final next15Minutes = DateTime(now.year, now.month, now.day, now.hour + (nextQuarterMinute == 0 ? 1 : 0), nextQuarterMinute);
-
     // Prossimo lunedì a mezzanotte per la weekly challenge
     final nextMonday = DateTime(now.year, now.month, now.day)
         .add(Duration(days: (8 - now.weekday) % 7 == 0 ? 7 : (8 - now.weekday) % 7));
@@ -59,7 +54,6 @@ class _RewardsPageState extends State<RewardsPage> {
       weeklyRemaining = DateTime(nextMonday.year, nextMonday.month, nextMonday.day)
           .difference(now);
       hourlyRemaining = nextHour.difference(now);
-      minuteRemaining = next15Minutes.difference(now);
     });
     // Ottieni challengeManager dal context
     final challengeManager = Provider.of<ChallengeManager>(context, listen: false);
@@ -84,9 +78,6 @@ class _RewardsPageState extends State<RewardsPage> {
     }
     if (hourlyRemaining.inSeconds <= 60) {
       removeClaim('hourly');
-    }
-    if (minuteRemaining.inSeconds <= 60) {
-      removeClaim('minute');
     }
   }
 
@@ -240,10 +231,7 @@ class _RewardsPageState extends State<RewardsPage> {
                   final description = challenge.getDescription(stepsManager);
                   double progress;
                   String duration = "";
-                  if (challenge.id == 'minute') {
-                    progress = stepsManager.minuteProgress.clamp(0.0, 1.0);
-                    duration = '- ${_formatDuration(minuteRemaining)}';
-                  } else if (challenge.id == 'hourly') {
+                  if (challenge.id == 'hourly') {
                     progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
                     duration = '- ${_formatDuration(hourlyRemaining)}';
                   } else if (challenge.id == 'daily' || challenge.id == 'daily_leppa' || challenge.id == 'daily_rowap') {
