@@ -199,42 +199,6 @@ class _HomePageState extends State<HomePage> {
     _phraseTimer = Timer(const Duration(seconds: 30), _changePhrase);
   }
 
-  bool _hasUnclaimedRewards(
-    StepsManager stepsManager,
-    ChallengeManager challengeManager,
-  ) {
-    for (final challenge in challengeManager.challenges) {
-      if (challenge.isClaimed) continue;
-
-      final stepsTarget = challenge.getStepsTarget(stepsManager);
-      double progress;
-      if (challenge.id == 'minute') {
-        progress = stepsManager.minuteProgress.clamp(0.0, 1.0);
-      } else if (challenge.id == 'hourly') {
-        progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
-      } else if (challenge.id == 'daily' ||
-          challenge.id == 'daily_leppa' ||
-          challenge.id == 'daily_rowap') {
-        progress = stepsManager.dailyProgress.clamp(0.0, 1.0);
-      } else if (challenge.id == 'weekly') {
-        progress = stepsManager.weeklyProgress.clamp(0.0, 1.0);
-      } else if (challenge.id == 'ch_001') {
-        progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
-      } else if (challenge.id == 'ch_002') {
-        progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
-      } else if (challenge.id == 'ch_003') {
-        progress = stepsManager.hourlyProgress.clamp(0.0, 1.0);
-      } else {
-        progress = (stepsManager.steps / stepsTarget).clamp(0.0, 1.0);
-      }
-
-      if (progress >= 1.0) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   void _showTutorial() {
     if (_tutorialStarted) return;
     _tutorialStarted = true;
@@ -610,6 +574,41 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   'You are on the right way, keep taking care of him! 🐒',
                   textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+          ),
+        );
+      });
+    }
+
+    // ─── Celebrate generic level ups ───
+    if (_previousLevel != -1 &&
+        pet.level > _previousLevel &&
+        pet.level != 1 &&
+        pet.level != 25 &&
+        pet.level != 50) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showDialog(
+          context: context,
+          barrierDismissible: true,
+          builder: (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            contentPadding: const EdgeInsets.all(24),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  '🎉 Level up!',
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Awesome! Your pet reached level ${pet.level}! Keep it up!',
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 18),
                 ),
               ],
             ),
@@ -1104,7 +1103,6 @@ class _HomePageState extends State<HomePage> {
                   onPressed: () {
                     final stepsMgr = context.read<StepsManager>();
                     final petRef = context.read<Pet>();
-
                     stepsMgr.addSteps(500);
                     petRef.updateExp(500);
                   },
