@@ -425,7 +425,7 @@ class _StatsPageState extends State<StatsPage> {
         ],
       ),
       body: GestureDetector(
-        behavior: HitTestBehavior.opaque, // importantissimo
+        behavior: HitTestBehavior.opaque,
         onHorizontalDragUpdate: (details) {
           if (details.delta.dx > 10) {
             Navigator.of(context).pop();
@@ -473,21 +473,15 @@ class _StatsPageState extends State<StatsPage> {
                 ),
                 const SizedBox(height: 40),
                 _buildStatItem(
-                  "Daily steps to the goal:",
-                  (stepsManager.dailyGoal - stepsManager.dailySteps).clamp(
-                    0,
-                    stepsManager.dailyGoal,
-                  ),
+                  "Daily goal:",
+                  (stepsManager.dailySteps).clamp(0, stepsManager.dailyGoal),
                   goal: stepsManager.dailyGoal,
                   key: _dailyKey,
                 ),
                 SizedBox(height: 40),
                 _buildStatItem(
-                  "Weekly steps to the goal:",
-                  (stepsManager.weeklyGoal - stepsManager.weeklySteps).clamp(
-                    0,
-                    stepsManager.weeklyGoal,
-                  ),
+                  "Weekly goal:",
+                  (stepsManager.weeklySteps).clamp(0, stepsManager.weeklyGoal),
                   goal: stepsManager.weeklyGoal,
                   key: _weeklyKey,
                 ),
@@ -520,32 +514,37 @@ class _StatsPageState extends State<StatsPage> {
           ),
         ),
       ),
-      bottomNavigationBar: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          color: const Color(0xFF688D92),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Image.asset(pet.imagePath, width: 60, height: 60),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Text(
-                    currentPhrase,
-                    style: const TextStyle(fontSize: 16),
-                  ),
+      bottomNavigationBar: pet.isEgg
+          ? null
+          : SafeArea(
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 10,
+                ),
+                color: const Color(0xFF688D92),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Image.asset(pet.imagePath, width: 60, height: 60),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Text(
+                          currentPhrase,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 }

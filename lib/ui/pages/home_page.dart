@@ -229,8 +229,8 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   'You have recived a strange egg, try to hatch it! It will become your personal pet, '
                   'so take care of him while you stay active.\n'
-                  'Click on the highlighted zones to complete this tutorial, or if you have already'
-                      'played this game, just skip it with the button!',
+                  'Tap on the highlighted zones to complete this tutorial, or if you have already'
+                  'played this game, just skip it with the button!',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
                 ),
@@ -287,7 +287,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 8),
                 Text(
                   'Remember to not let him starve, and this is the place where you can do it. '
-                      'Of course, for now, you cant feed an egg.',
+                  'Of course, for now, you cant feed an egg.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -315,7 +315,7 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(height: 8),
                 Text(
                   'Collect prizes for your steps progress. If you see a red dot on this icon,'
-                      ' it seems that you have something to claim!',
+                  ' it seems that you have something to claim!',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -456,7 +456,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Click here to see this tutorial again.',
+                  'Tap here to see this tutorial again.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -965,9 +965,11 @@ class _HomePageState extends State<HomePage> {
                                   setState(() => _rewardsButtonScaling = true);
                                   Future.delayed(
                                     const Duration(milliseconds: 200),
-                                        () {
+                                    () {
                                       if (!mounted) return;
-                                      setState(() => _rewardsButtonScaling = false);
+                                      setState(
+                                        () => _rewardsButtonScaling = false,
+                                      );
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
@@ -990,11 +992,16 @@ class _HomePageState extends State<HomePage> {
                                   children: const [
                                     Icon(Icons.card_giftcard),
                                     SizedBox(height: 4),
-                                    Text('Rewards', textAlign: TextAlign.center),
+                                    Text(
+                                      'Rewards',
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ],
                                 ),
                               ),
-                              if (challengeManager.hasReadyToClaim(stepsManager))
+                              if (challengeManager.hasReadyToClaim(
+                                stepsManager,
+                              ))
                                 Positioned(
                                   top: 4,
                                   right: 4,
