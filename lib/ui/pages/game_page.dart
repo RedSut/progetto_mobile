@@ -14,6 +14,16 @@ class _Platform {
   double width;
   bool scored;
   _Platform(this.x, this.y, [this.width = 60]) : scored = false;
+  @override
+  String toString() => 'Platform(x: $x, y: $y, width: $width)';
+}
+bool _isPlatformTangible(_Platform p, Size size) {
+  if (p.width <= 0) return false;
+  if (p.x.isNaN || p.y.isNaN || p.width.isNaN) return false;
+  if (p.x.isInfinite || p.y.isInfinite || p.width.isInfinite) return false;
+  if (p.x + p.width < 0 || p.x > size.width) return false;
+  if (p.y < 0 || p.y > size.height) return false;
+  return true;
 }
 
 class GamePage extends StatefulWidget {
@@ -88,6 +98,9 @@ class _GamePageState extends State<GamePage> {
         ),
       ),
     ];
+    for (final p in _platforms) {
+      assert(_isPlatformTangible(p, size), 'Intangible platform: $p');
+    }
     _jumps = 0;
     _gameOver = false;
     _started = false;
@@ -143,6 +156,7 @@ class _GamePageState extends State<GamePage> {
         p.x = rnd.nextDouble() * (size.width - p.width);
         p.y = highest - _platformGap;
         p.scored = false;
+        assert(_isPlatformTangible(p, size), 'Intangible platform: $p');
       }
     }
 
@@ -196,8 +210,8 @@ class _GamePageState extends State<GamePage> {
                   ),
                   const SizedBox(height: 12),
                   Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 24),
-                    padding: const EdgeInsets.all(12),
+                    margin: const EdgeInsets.symmetric(horizontal: 25),
+                    padding: const EdgeInsets.all(1),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(12),
@@ -210,7 +224,7 @@ class _GamePageState extends State<GamePage> {
                       ],
                     ),
                     child: const Text(
-                      'Tilt your phone to move and jump across platforms. Avoid falling! '
+                      '\nTilt your phone to move and jump across platforms. Avoid falling! '
                       'You can check our high score in the stats page. '
                       'Also, every jump we make together gives me experience!\n',
                       textAlign: TextAlign.center,

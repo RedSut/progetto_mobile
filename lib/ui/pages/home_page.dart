@@ -952,7 +952,7 @@ class _HomePageState extends State<HomePage> {
                         scale: _rewardsButtonScaling ? 1.1 : 1.0,
                         duration: const Duration(milliseconds: 200),
                         child: SizedBox(
-                          width: 105,
+                          width: 100,
                           height: 80,
                           child: Stack(
                             clipBehavior: Clip.none,
