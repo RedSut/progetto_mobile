@@ -46,7 +46,8 @@ class _RewardsPageState extends State<RewardsPage> {
     final nextHour = DateTime(now.year, now.month, now.day, now.hour + 1);
 
     // Prossimo minuto per la minute challenge
-    final next15Minutes = DateTime(now.year, now.month, now.day, now.hour, now.minute + 15);
+    int nextQuarterMinute = (((now.minute + 14) ~/ 15) * 15) % 60;
+    final next15Minutes = DateTime(now.year, now.month, now.day, now.hour + (nextQuarterMinute == 0 ? 1 : 0), nextQuarterMinute);
 
     // Prossimo lunedì a mezzanotte per la weekly challenge
     final nextMonday = DateTime(now.year, now.month, now.day)
@@ -83,6 +84,9 @@ class _RewardsPageState extends State<RewardsPage> {
     }
     if (hourlyRemaining.inSeconds <= 60) {
       removeClaim('hourly');
+    }
+    if (minuteRemaining.inSeconds <= 60) {
+      removeClaim('minute');
     }
   }
 

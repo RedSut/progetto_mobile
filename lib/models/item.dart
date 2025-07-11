@@ -33,7 +33,7 @@ class ItemManager {
       imagePath: 'assets/itemPecha.png',
       description:
           "It strongly resembles a peach, but it's much larger. Give this to your pet, it"
-          "can feed it a lot.",
+          " can feed it a lot.",
       feedValue: 20,
     ),
     const Item(
@@ -50,7 +50,7 @@ class ItemManager {
       imagePath: 'assets/itemRowap.png',
       description:
           "It strongly resembles grapes, but it's much stranger. You can feed your"
-          "pet just a little with it.",
+          " pet just a little with it.",
       feedValue: 10,
     ),
   ];

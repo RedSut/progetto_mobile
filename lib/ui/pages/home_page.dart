@@ -63,7 +63,7 @@ class _HomePageState extends State<HomePage> {
   static const List<String> sadNotHungryPhrases = [
     'I am not feeling so happy...',
     "I'm a little bored.",
-    "I reaaly need to stay together .",
+    "I really need to stay together .",
     'Sigh... what a sad day.',
     'Can you play with me?',
   ];
@@ -73,7 +73,7 @@ class _HomePageState extends State<HomePage> {
     'my stomach is growling and I feel alone...',
     'Please, can you give me something to eat?',
     '😞😞...',
-    'No food and no happyness today...',
+    'No food and no happiness today...',
   ];
 
   String _currentPhrase = '';
@@ -227,9 +227,9 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'You have recived a strange egg, try to hatch it! It will become your personal pet, '
+                  'You have received a strange egg, try to hatch it! It will become your personal pet, '
                   'so take care of him while you stay active.\n'
-                  'Tap on the highlighted zones to complete this tutorial, or if you have already'
+                  'Tap on the highlighted zones to complete this tutorial, or if you have already '
                   'played this game, just skip it with the button!',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
@@ -486,6 +486,7 @@ class _HomePageState extends State<HomePage> {
     _mockStepTimer?.cancel();
     _phraseTimer?.cancel();
     _eggCheckTimer?.cancel();
+    _hungerHappinessTimer?.cancel();
     _pet.removeListener(_handlePetChange);
     super.dispose();
   }
