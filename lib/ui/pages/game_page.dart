@@ -41,6 +41,7 @@ class _GamePageState extends State<GamePage> {
 
   late double _petX;
   late double _petY;
+  double _prevPetY = 0;
   double _vx = 0;
   double _vy = 0;
 
@@ -84,6 +85,7 @@ class _GamePageState extends State<GamePage> {
     _petX = size.width / 2 - _petSize / 2;
     // start a little lower than half screen so the camera can follow up
     _petY = size.height * 0.6 - _petSize / 2;
+    _prevPetY = _petY;
     _vx = 0;
     _vy = 0;
     final rnd = Random();
@@ -118,6 +120,7 @@ class _GamePageState extends State<GamePage> {
 
   void _update(Timer timer) {
     final size = MediaQuery.of(context).size;
+    _prevPetY = _petY;
     _vy += _gravity;
     _petX += _vx;
     _petY += _vy;
@@ -127,11 +130,13 @@ class _GamePageState extends State<GamePage> {
 
     final rnd = Random();
     for (final p in _platforms) {
-      if (_vy > 0 &&
-          _petY + _petSize >= p.y &&
-          _petY + _petSize <= p.y + 10 &&
-          _petX + _petSize >= p.x &&
-          _petX <= p.x + p.width) {
+      final prevBottom = _prevPetY + _petSize;
+      final newBottom = _petY + _petSize;
+      final bool horizontal =
+          _petX + _petSize >= p.x && _petX <= p.x + p.width;
+      final bool crossed = prevBottom <= p.y && newBottom >= p.y;
+      if (_vy > 0 && crossed && horizontal) {
+        _petY = p.y - _petSize;
         _vy = _jumpVelocity;
         if (!p.scored) {
           _jumps++;
@@ -167,7 +172,7 @@ class _GamePageState extends State<GamePage> {
       _accelSub?.cancel();
       _saveScore();
     }
-
+    _prevPetY = _petY;
     setState(() {});
   }
 
