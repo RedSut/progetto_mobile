@@ -265,7 +265,8 @@ class _HomePageState extends State<HomePage> {
                 Text(
                   'You have recived a strange egg, try to hatch it! It will become your personal pet, '
                   'so take care of him while you stay active.\n'
-                  'Click on the highlighted zones to complete the tutorial!',
+                  'Click on the highlighted zones to complete this tutorial, or if you have already'
+                      'played this game, just skip it with the button!',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white),
                 ),
@@ -293,7 +294,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'This is your pet! Hold the pet to see if he\'s happy or hungry. Remember that eggs have nothing to say,'
+                  'This is your pet! Press and hold the pet to see if it\'s happy or hungry. Remember that eggs have nothing to say,'
                   ' so try to hatch it! You can earn exp by walking with him.',
                   style: TextStyle(color: Colors.white),
                 ),
@@ -321,7 +322,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Remember to not let him starve. Of course, for now, you cant feed an egg.',
+                  'Remember to not let him starve, and this is the place where you can do it. '
+                      'Of course, for now, you cant feed an egg.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -348,7 +350,8 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'Collect prizes for your steps progress.',
+                  'Collect prizes for your steps progress. If you see a red dot on this icon,'
+                      ' it seems that you have something to claim!',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
@@ -432,7 +435,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 SizedBox(height: 8),
                 Text(
-                  'you can swipe up here to open your bag.',
+                  'Also you can swipe up here to open your bag.',
                   style: TextStyle(color: Colors.white),
                 ),
               ],
